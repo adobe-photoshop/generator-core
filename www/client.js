@@ -7,11 +7,16 @@ require.config({
     }
 });
 
+// Flag set to avoid repeating the close message over and over
+// if the node process dies.
+var SocketClosedErrorDisplayed = false;
+var SocketClosedErrorMessage = "WebSocket closed in client";
+
 define(function (require, exports, module) {
     "use strict";
 
     var CHECK_CONNECTION_INTERVAL = 1000; // milliseconds
-    
+        
     var Mustache = require("vendor/mustache"),
         entryTemplate = Mustache.compile(require("text!templates/entry.html"));
     
@@ -35,9 +40,13 @@ define(function (require, exports, module) {
         
         var $entry = $(entryTemplate(logEntry));
         
+        SocketClosedErrorDisplayed = (SocketClosedErrorDisplayed
+                               && ((logEntry.type === "error")
+                                   || logEntry.msg === SocketClosedErrorMessage));
+        
         switch (logEntry.type) {
         case "plugin":
-            $entry.addClass("success");
+            $entry.addClass((logEntry.msg.search(/^[Ee]rror/) < 0) ? "plugin" : "error");
             break;
         case "init":
             $entry.addClass("warning");
@@ -76,14 +85,17 @@ define(function (require, exports, module) {
         }
         
         function closeHandler() {
-            display({
-                id : -1,
-                time : new Date(),
-                type : "error",
-                source : "logger",
-                msg : "WebSocket closed in client",
-                data : Array.prototype.slice.call(arguments, 0)
-            });
+            if (!SocketClosedErrorDisplayed) {
+                display({
+                    id : -1,
+                    time : new Date(),
+                    type : "error",
+                    source : "logger",
+                    msg : SocketClosedErrorMessage,
+                    data : Array.prototype.slice.call(arguments, 0)
+                });
+            }
+            SocketClosedErrorDisplayed = true;
         }
         
         _websocket = new WebSocket(url);
