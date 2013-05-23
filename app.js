@@ -41,8 +41,7 @@
         "P" : "password",
         "i" : null,
         "o" : null,
-        "l" : 49495,
-        "t" : 500
+        "l" : 49495
     });
     
     var argv = optionParser
@@ -54,7 +53,6 @@
             "i": "file descriptor of input pipe",
             "o": "file descriptor of output pipe",
             "l": "the logger server port",
-            "t": "time before timeout in milliseconds",
             "help": "display help message"
         }).alias({
             "p": "port",
@@ -62,8 +60,7 @@
             "P": "password",
             "i": "input",
             "o": "output",
-            "l": "loggerport",
-            "t": "timeout"
+            "l": "loggerport"
         }).argv;
     
     if (argv.help) {
@@ -97,22 +94,17 @@
             options.host = argv.host;
             options.password = argv.password;
         }
-        
-        options.timeout = argv.timeout;
-        
+                
         theGenerator.start(options).then(
             function () {
                 logger.log("init", "app", "Generator started!", null);
-                /*
-                var enablePlugins = argv.use ? argv.use.split(" ") : false;
-                var disablePlugins = argv.nuse ? argv.nuse.split(" ") : [];
-                var activePlugins = theGenerator.loadPlugins(enablePlugins, disablePlugins);
-                logger.log("init", "app", "loaded plugins", activePlugins);
-                */
+
                 theGenerator.subscribe("#", function (data, envelope) {
                     var args = Array.prototype.slice.call(arguments, 0);
                     logger.log("publish", envelope.channel, envelope.topic, data);
                 });
+                
+                
                 deferred.resolve(theGenerator);
             },
             function (err) {
