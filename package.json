@@ -14,8 +14,7 @@
     "connect": "~2.7.4",
     "ws": "~0.4.25",
     "q": "~0.9.3",
-    "postal": "~0.8.2",
-    "async": "~0.2.8"
+    "postal": "~0.8.2"
   },
   "devDependencies": {
     "grunt-shell": "~0.2.2",

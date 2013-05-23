@@ -7,7 +7,7 @@
         fs = require("fs"),
         generator = require("./lib/generator"),
         logger = require("./lib/logger"),
-        async = require("async"),
+        Q = require("q"),
         version = require("./package.json").version;
     
     var optimist = require("optimist");
@@ -48,19 +48,20 @@
         process.exit(0);
     }
     
-    function setupLogger(callback) {
+    function startLogServer() {
+        var deferred = Q.defer();
         logger.startServer(argv.loggerport, "localhost", function (err, address) {
             if (err) {
-                console.error("Error starting logger:", err);
-                callback(null, null);
+                deferred.reject(err);
             } else {
-                console.log("Logger listening at http://localhost:%d", address.port);
-                callback(null, address);
+                deferred.resolve(address);
             }
         });
+        return deferred.promise;
     }
     
-    function setupGenerator(callback) {
+    function setupGenerator() {
+        var deferred = Q.defer();
         var theGenerator = generator.createGenerator();
 
         var options = {};
@@ -89,13 +90,14 @@
                     var args = Array.prototype.slice.call(arguments, 0);
                     logger.log("publish", envelope.channel, envelope.topic, data);
                 });
-                callback(null, theGenerator);
+                deferred.resolve(theGenerator);
             },
             function (err) {
-                console.error("Error starting Generator:", err);
-                callback(err, null);
+                deferred.reject(err);
             }
         );
+        
+        return deferred.promise;
     }
     
     process.on("uncaughtException", function (err) {
@@ -104,13 +106,24 @@
         process.exit(-1);
     });
     
-    async.series([
-        setupLogger,
-        setupGenerator
-    ], function (err, results) {
-        if (err) {
-            process.exit(-1);
+    startLogServer().done(
+        function (address) {
+            console.log("Log server running at http://localhost:" + address.port);
+        },
+        function (err) {
+            console.error("Error starting log server:", err);
         }
-    });
-    
+    );
+                          
+    setupGenerator().done(
+        function (generator) {
+            console.log("Generator initialized");
+        },
+        function (err) {
+            console.error("Generator failed to initialize:", err);
+            console.error("Exiting...");
+            process.exit("-1");
+        }
+    );
+
 }());
