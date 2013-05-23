@@ -28,6 +28,7 @@
     var http = require("http"),
         net = require("net"),
         fs = require("fs"),
+        util = require("util"),
         generator = require("./lib/generator"),
         logger = require("./lib/logger"),
         Q = require("q"),
@@ -41,6 +42,7 @@
         "P" : "password",
         "i" : null,
         "o" : null,
+        "f" : null,
         "l" : 49495
     });
     
@@ -52,6 +54,7 @@
             "P": "the Photoshop server password",
             "i": "file descriptor of input pipe",
             "o": "file descriptor of output pipe",
+            "f": "folder to search for plugins (can be used multiple times)",
             "l": "the logger server port",
             "help": "display help message"
         }).alias({
@@ -60,6 +63,7 @@
             "P": "password",
             "i": "input",
             "o": "output",
+            "f": "pluginfolder",
             "l": "loggerport"
         }).argv;
     
@@ -104,6 +108,13 @@
                     logger.log("publish", envelope.channel, envelope.topic, data);
                 });
                 
+                var folders = argv.pluginfolder;
+                if (folders && !util.isArray(folders)) {
+                    folders = [folders];
+                }
+                folders.forEach(function (f) {
+                    theGenerator.loadAllPluginsInDirectory(f);
+                });
                 
                 deferred.resolve(theGenerator);
             },
