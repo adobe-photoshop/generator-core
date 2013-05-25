@@ -1,5 +1,4 @@
-/*jslint sloppy: true, plusplus: true */
-/*global params, ActionDescriptor, stringIDToTypeID, executeAction, DialogModes */
+/* global params, ActionDescriptor, stringIDToTypeID, executeAction, DialogModes */
 
 // Expected params:
 //   - events: Array of strings representing event names

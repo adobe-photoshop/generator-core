@@ -21,8 +21,8 @@
  * 
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50, browser: true */
-/*global require, define, $, WebSocket */
+/* jshint node: false, browser: true, jquery: true */
+/* global define */
 
 require.config({
     paths: {
@@ -35,7 +35,7 @@ require.config({
 var SocketClosedErrorDisplayed = false;
 var SocketClosedErrorMessage = "WebSocket closed in client";
 
-define(function (require, exports, module) {
+define(function (require) {
     "use strict";
 
     var CHECK_CONNECTION_INTERVAL = 1000; // milliseconds
@@ -63,9 +63,9 @@ define(function (require, exports, module) {
         
         var $entry = $(entryTemplate(logEntry));
         
-        SocketClosedErrorDisplayed = (SocketClosedErrorDisplayed
-                               && ((logEntry.type === "error")
-                                   || logEntry.msg === SocketClosedErrorMessage));
+        SocketClosedErrorDisplayed = (SocketClosedErrorDisplayed &&
+            ((logEntry.type === "error") ||
+                logEntry.msg === SocketClosedErrorMessage));
         
         switch (logEntry.type) {
         case "plugin":
@@ -85,7 +85,7 @@ define(function (require, exports, module) {
             break;
             
         }
-        $entry.on('click', function () {
+        $entry.on("click", function () {
             $("#log-data-" + logEntry.id).toggleClass("hidden");
         });
 

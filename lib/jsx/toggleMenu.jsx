@@ -1,4 +1,3 @@
-/*jslint sloppy: true, plusplus: true */
 /*global params, stringIDToTypeID, ActionDescriptor, executeAction, DialogModes */
 
 // Expected params:

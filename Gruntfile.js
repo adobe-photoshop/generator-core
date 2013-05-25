@@ -21,13 +21,10 @@
  * 
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50, node: true */
-
 module.exports = function (grunt) {
     "use strict";
     
     var resolve = require("path").resolve,
-        rename = require("fs").renameSync,
         chmod = require("fs").chmodSync,
         cpus = require("os").cpus;
     
@@ -38,6 +35,21 @@ module.exports = function (grunt) {
         "directories" : {
             "downloads" : "downloads/",
             "bin" : "bin/"
+        },
+
+        "jshint" : {
+            "options" : {
+                "jshintrc"   : ".jshintrc"
+            },
+            "all" : [
+                "*.js",
+                "package.json",
+                ".jshintrc",
+                "lib/**/*.js",
+                "lib/jsx/**/*.jsx",
+                "www/**/*.js",
+                "!www/vendor/**/*.js"
+            ]
         },
         
         "clean" : {
@@ -87,12 +99,13 @@ module.exports = function (grunt) {
         
     });
 
+    grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks("grunt-shell");
     grunt.loadNpmTasks("grunt-curl");
 
-    grunt.registerTask("default", ["build"]);
+    grunt.registerTask("default", ["jshint", "build"]);
         
     grunt.registerTask("build", "Top-level configure and build", function () {
         var platform = grunt.config("platform"),

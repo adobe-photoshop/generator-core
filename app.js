@@ -21,19 +21,13 @@
  * 
  */
 
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50, node: true */
-
 (function () {
     "use strict";
-    var http = require("http"),
-        net = require("net"),
-        fs = require("fs"),
-        util = require("util"),
+    var util = require("util"),
         generator = require("./lib/generator"),
         logger = require("./lib/logger"),
-        Q = require("q"),
-        version = require("./package.json").version;
-    
+        Q = require("q");
+
     var optimist = require("optimist");
     
     var optionParser = optimist["default"]({
@@ -104,7 +98,6 @@
                 logger.log("init", "app", "Generator started!", null);
 
                 theGenerator.subscribe("#", function (data, envelope) {
-                    var args = Array.prototype.slice.call(arguments, 0);
                     logger.log("publish", envelope.channel, envelope.topic, data);
                 });
                 
@@ -142,7 +135,7 @@
     );
                           
     setupGenerator().done(
-        function (generator) {
+        function () {
             console.log("Generator initialized");
         },
         function (err) {
