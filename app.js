@@ -26,9 +26,11 @@
     var util = require("util"),
         generator = require("./lib/generator"),
         logger = require("./lib/logger"),
-        Q = require("q");
+        Q = require("q"),
+        optimist = require("optimist");
 
-    var optimist = require("optimist");
+    var HEARTBEAT_DELAY = 10000, // one second
+        heartbeatCount = 0;
     
     var optionParser = optimist["default"]({
         "p" : 49494,
@@ -64,6 +66,14 @@
     if (argv.help) {
         console.log(optimist.help());
         process.exit(0);
+    }
+
+    function stop(exitCode, reason) {
+        if (!reason) {
+            reason = "no reason given";
+        }
+        console.error("Exiting with code " + exitCode + ": " + reason);
+        process.exit(exitCode);
     }
     
     function startLogServer() {
@@ -102,13 +112,15 @@
                 });
                 
                 var folders = argv.pluginfolder;
-                if (folders && !util.isArray(folders)) {
-                    folders = [folders];
+                if (folders) {
+                    if (!util.isArray(folders)) {
+                        folders = [folders];
+                    }
+                    folders.forEach(function (f) {
+                        theGenerator.loadAllPluginsInDirectory(f);
+                    });
                 }
-                folders.forEach(function (f) {
-                    theGenerator.loadAllPluginsInDirectory(f);
-                });
-                
+
                 deferred.resolve(theGenerator);
             },
             function (err) {
@@ -120,9 +132,8 @@
     }
     
     process.on("uncaughtException", function (err) {
-        console.error("Terminating - Uncaught exception: %s", err.message);
         console.error(err.stack);
-        process.exit(-1);
+        stop(-1, "uncaught exception: " + err.message);
     });
     
     startLogServer().done(
@@ -139,10 +150,42 @@
             console.log("Generator initialized");
         },
         function (err) {
-            console.error("Generator failed to initialize:", err);
-            console.error("Exiting...");
-            process.exit("-1");
+            stop(-3, "generator failed to initialize: " + err);
         }
     );
+
+    // Routinely check if stdout is closed. Stdout will close when our
+    // parent process closes (either expectedly or unexpectedly) so this
+    // is our signal to shutdown to prevent process abandonment.
+    process.stdout.on("end", function () {
+        stop(-2, "received end on stdout");
+    });
+
+    process.stdout.on("error", function () {
+        stop(-2, "async error writing to stdout");
+    });
+
+    if (!process.stdout.isTTY) {
+        // We need to continually ping because that's the only way to actually
+        // check if the pipe is closed in a robust way (writable may only get
+        // set to false after trying to write a ping to a closed pipe).
+        //
+        // As an example, on OS X, doing "node app.js | cat" and then killing
+        // the cat process with "kill -9" does *not* generate an end event
+        // immediately. However, writing to the pipe generates an error event.
+        setInterval(function () {
+            if (!process.stdout.writable) {
+                // If stdout closes, our parent process has terminated or
+                // has explicitly closed it. Either way, we should exit.
+                stop(-2, "stdout closed");
+            } else {
+                try {
+                    process.stdout.write("PING " + (heartbeatCount++) + "\n");
+                } catch (e) {
+                    stop(-2, "sync error writing to stdout");
+                }
+            }
+        }, HEARTBEAT_DELAY);
+    }
 
 }());
