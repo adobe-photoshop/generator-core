@@ -25,13 +25,11 @@ module.exports = function (grunt) {
     "use strict";
     
     var resolve = require("path").resolve,
-        chmod = require("fs").chmodSync,
-        cpus = require("os").cpus;
-    
+        chmod = require("fs").chmodSync;
+
     grunt.initConfig({
         "pkg" : grunt.file.readJSON("package.json"),
         "platform" : process.platform === "darwin" ? "mac" : "win",
-        "numProcs" : cpus().length,
         "directories" : {
             "downloads" : "downloads/",
             "bin" : "bin/"
