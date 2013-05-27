@@ -29,9 +29,12 @@
         Q = require("q"),
         optimist = require("optimist");
 
-    var HEARTBEAT_DELAY = 10000, // one second
+    var HEARTBEAT_DELAY = 1000, // one second
         heartbeatCount = 0;
     
+    var DEBUG_ON_LAUNCH = false,
+        LOG_FILENAME = null;
+
     var optionParser = optimist["default"]({
         "p" : 49494,
         "h" : "localhost",
@@ -54,6 +57,7 @@
             "f": "folder to search for plugins (can be used multiple times)",
             "l": "the logger server port",
             "n": "the filename to write the log (specifying -n witout filename uses stdout)",
+            "debuglaunch": "start debugger instead of initializing (call start() to init)",
             "help": "display help message"
         }).alias({
             "p": "port",
@@ -134,67 +138,100 @@
         return deferred.promise;
     }
     
+    function init() {
+
+        // Log to file if specified
+        var logFilename = LOG_FILENAME || argv.loggerfile;
+        if (logFilename) {
+            logger.setLogFilename(logFilename);
+        }
+
+        // Record command line arguments
+        logger.log("init", "app", "unparsed command line", process.argv);
+        logger.log("init", "app", "parsed command line", argv);
+
+        // Start async process to launch log server
+        startLogServer().done(
+            function (address) {
+                console.log("Log server running at http://localhost:" + address.port);
+            },
+            function (err) {
+                console.error("Error starting log server:", err);
+            }
+        );
+                              
+        // Start async process to initialize generator
+        setupGenerator().done(
+            function () {
+                console.log("Generator initialized");
+            },
+            function (err) {
+                stop(-3, "generator failed to initialize: " + err);
+            }
+        );
+
+        // Routinely check if stdout is closed. Stdout will close when our
+        // parent process closes (either expectedly or unexpectedly) so this
+        // is our signal to shutdown to prevent process abandonment.
+        process.stdout.on("end", function () {
+            stop(-2, "received end on stdout");
+        });
+
+        process.stdout.on("error", function () {
+            stop(-2, "async error writing to stdout");
+        });
+
+        if (!process.stdout.isTTY) {
+            // We need to continually ping because that's the only way to actually
+            // check if the pipe is closed in a robust way (writable may only get
+            // set to false after trying to write a ping to a closed pipe).
+            //
+            // As an example, on OS X, doing "node app.js | cat" and then killing
+            // the cat process with "kill -9" does *not* generate an end event
+            // immediately. However, writing to the pipe generates an error event.
+            setInterval(function () {
+                if (!process.stdout.writable) {
+                    // If stdout closes, our parent process has terminated or
+                    // has explicitly closed it. Either way, we should exit.
+                    stop(-2, "stdout closed");
+                } else {
+                    try {
+                        process.stdout.write("PING " + (heartbeatCount++) + "\n");
+                    } catch (e) {
+                        stop(-2, "sync error writing to stdout");
+                    }
+                }
+            }, HEARTBEAT_DELAY);
+        }
+
+    }
+
     process.on("uncaughtException", function (err) {
         console.error(err.stack);
         stop(-1, "uncaught exception: " + err.message);
     });
 
-    if (argv.loggerfile) {
-        logger.setLogFilename(argv.loggerfile);
-    }
-    
-    logger.log("init", "app", "parsed command line", argv);
+    if (DEBUG_ON_LAUNCH || argv.debuglaunch) {
+        // Set a timer that will keep our process from exiting.
+        var debugStartTimeout = setInterval(function () {
+            console.error("hit debugger init timeout");
+        }, 100000);
 
-    startLogServer().done(
-        function (address) {
-            console.log("Log server running at http://localhost:" + address.port);
-        },
-        function (err) {
-            console.error("Error starting log server:", err);
-        }
-    );
-                          
-    setupGenerator().done(
-        function () {
-            console.log("Generator initialized");
-        },
-        function (err) {
-            stop(-3, "generator failed to initialize: " + err);
-        }
-    );
+        // Put a function in the global namespace that runs "init". Needs
+        // to call init on the event loop so that it can be debugged (code that
+        // runs from the REPL/console cannot be debugged).
+        global.start = function () {
+            clearTimeout(debugStartTimeout);
+            process.nextTick(function () {
+                init();
+            });
+        };
 
-    // Routinely check if stdout is closed. Stdout will close when our
-    // parent process closes (either expectedly or unexpectedly) so this
-    // is our signal to shutdown to prevent process abandonment.
-    process.stdout.on("end", function () {
-        stop(-2, "received end on stdout");
-    });
-
-    process.stdout.on("error", function () {
-        stop(-2, "async error writing to stdout");
-    });
-
-    if (!process.stdout.isTTY) {
-        // We need to continually ping because that's the only way to actually
-        // check if the pipe is closed in a robust way (writable may only get
-        // set to false after trying to write a ping to a closed pipe).
-        //
-        // As an example, on OS X, doing "node app.js | cat" and then killing
-        // the cat process with "kill -9" does *not* generate an end event
-        // immediately. However, writing to the pipe generates an error event.
-        setInterval(function () {
-            if (!process.stdout.writable) {
-                // If stdout closes, our parent process has terminated or
-                // has explicitly closed it. Either way, we should exit.
-                stop(-2, "stdout closed");
-            } else {
-                try {
-                    process.stdout.write("PING " + (heartbeatCount++) + "\n");
-                } catch (e) {
-                    stop(-2, "sync error writing to stdout");
-                }
-            }
-        }, HEARTBEAT_DELAY);
+        // Start the debugger
+        process._debugProcess(process.pid);
+    } else {
+        // Not debugging on launch, so start normally
+        init();
     }
 
 }());
