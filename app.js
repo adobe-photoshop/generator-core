@@ -39,7 +39,8 @@
         "i" : null,
         "o" : null,
         "f" : null,
-        "l" : 49495
+        "l" : 49495,
+        "n" : null
     });
     
     var argv = optionParser
@@ -52,6 +53,7 @@
             "o": "file descriptor of output pipe",
             "f": "folder to search for plugins (can be used multiple times)",
             "l": "the logger server port",
+            "n": "the filename to write the log (specifying -n witout filename uses stdout)",
             "help": "display help message"
         }).alias({
             "p": "port",
@@ -60,7 +62,8 @@
             "i": "input",
             "o": "output",
             "f": "pluginfolder",
-            "l": "loggerport"
+            "l": "loggerport",
+            "n": "loggerfile"
         }).argv;
     
     if (argv.help) {
@@ -135,7 +138,13 @@
         console.error(err.stack);
         stop(-1, "uncaught exception: " + err.message);
     });
+
+    if (argv.loggerfile) {
+        logger.setLogFilename(argv.loggerfile);
+    }
     
+    logger.log("init", "app", "parsed command line", argv);
+
     startLogServer().done(
         function (address) {
             console.log("Log server running at http://localhost:" + address.port);
