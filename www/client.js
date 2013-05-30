@@ -66,17 +66,20 @@ define(function (require) {
         SocketClosedErrorDisplayed = (SocketClosedErrorDisplayed &&
             ((logEntry.type === "error") ||
                 logEntry.msg === SocketClosedErrorMessage));
+      
+        var foundLogError = (logEntry.msg.search(/^[Ee]rror/) >= 0)
+                          || (logEntry.dataString.search(/^[Ee]rror/) >= 0);
         
         switch (logEntry.type) {
         case "plugin":
-            $entry.addClass((logEntry.msg.search(/^[Ee]rror/) < 0) ? "plugin" : "error");
+            $entry.addClass( foundLogError ? "error" : "plugin");
             break;
         case "init":
             $entry.addClass("warning");
             break;
         case "action":
         case "publish":
-            $entry.addClass("info");
+            $entry.addClass(foundLogError ? "error" : "info");
             break;
         case "error":
             $entry.addClass("error");
