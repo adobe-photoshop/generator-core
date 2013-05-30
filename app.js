@@ -104,7 +104,8 @@
         });
 
         var options = {};
-        if (typeof argv.input === "number" && typeof argv.output === "number") {
+        if ((typeof argv.input === "number" && typeof argv.output === "number") ||
+            (typeof argv.input === "string" && typeof argv.output === "string")) {
             options.inputFd = argv.input;
             options.outputFd = argv.output;
             options.password = null; // No encryption over pipes
