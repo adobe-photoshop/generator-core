@@ -99,6 +99,10 @@
         var deferred = Q.defer();
         var theGenerator = generator.createGenerator();
 
+        theGenerator.subscribe("#", function (data, envelope) {
+            logger.log("publish", envelope.channel, envelope.topic, data);
+        });
+
         var options = {};
         if (typeof argv.input === "number" && typeof argv.output === "number") {
             options.inputFd = argv.input;
@@ -109,14 +113,10 @@
             options.host = argv.host;
             options.password = argv.password;
         }
-                
+        
         theGenerator.start(options).then(
             function () {
                 logger.log("init", "app", "Generator started!", null);
-
-                theGenerator.subscribe("#", function (data, envelope) {
-                    logger.log("publish", envelope.channel, envelope.topic, data);
-                });
                 
                 var folders = argv.pluginfolder;
                 if (folders) {
