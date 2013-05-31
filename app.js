@@ -148,6 +148,7 @@
         }
 
         // Record command line arguments
+        logger.log("init", "app", "node version", process.versions);
         logger.log("init", "app", "unparsed command line", process.argv);
         logger.log("init", "app", "parsed command line", argv);
 
