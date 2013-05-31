@@ -43,7 +43,8 @@
         "o" : null,
         "f" : null,
         "l" : 49495,
-        "n" : null
+        "n" : null,
+        "t" : 5000
     });
     
     var argv = optionParser
@@ -57,6 +58,7 @@
             "f": "folder to search for plugins (can be used multiple times)",
             "l": "the logger server port",
             "n": "the filename to write the log (specifying -n witout filename uses stdout)",
+            "t": "request timeout in milliseconds",
             "debuglaunch": "start debugger instead of initializing (call start() to init)",
             "help": "display help message"
         }).alias({
@@ -67,7 +69,8 @@
             "o": "output",
             "f": "pluginfolder",
             "l": "loggerport",
-            "n": "loggerfile"
+            "n": "loggerfile",
+            "t": "timeout"
         }).argv;
     
     if (argv.help) {
@@ -115,6 +118,10 @@
             options.password = argv.password;
         }
         
+        if (typeof argv.timeout === "number") {
+            options.timeout = argv.timeout;
+        }
+
         theGenerator.start(options).then(
             function () {
                 logger.log("init", "app", "Generator started!", null);
