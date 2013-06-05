@@ -32,8 +32,7 @@ require.config({
 
 // Flag set to avoid repeating the close message over and over
 // if the node process dies.
-var SocketClosedErrorDisplayed = false;
-var SocketClosedErrorMessage = "WebSocket closed in client";
+var socketErrorDisplayed = false;
 
 define(function (require) {
     "use strict";
@@ -63,16 +62,16 @@ define(function (require) {
         
         var $entry = $(entryTemplate(logEntry));
         
-        SocketClosedErrorDisplayed = (SocketClosedErrorDisplayed &&
-            ((logEntry.type === "error") ||
-                logEntry.msg === SocketClosedErrorMessage));
+        // socketErrorDisplayed = (socketErrorDisplayed &&
+        //     ((logEntry.type === "error") ||
+        //         logEntry.msg === SocketClosedErrorMessage));
       
-        var foundLogError = (logEntry.msg.search(/^[Ee]rror/) >= 0)
-                          || (logEntry.dataString.search(/^[Ee]rror/) >= 0);
+        var foundLogError = (logEntry.msg.search(/^[Ee]rror/) >= 0) ||
+            (logEntry.dataString.search(/^[Ee]rror/) >= 0);
         
         switch (logEntry.type) {
         case "plugin":
-            $entry.addClass( foundLogError ? "error" : "plugin");
+            $entry.addClass(foundLogError ? "error" : "plugin");
             break;
         case "init":
             $entry.addClass("warning");
@@ -100,28 +99,31 @@ define(function (require) {
         var url = protocol + "//" + window.location.host;
                 
         function errorHandler() {
-            display({
-                id : -1,
-                time : new Date(),
-                type : "error",
-                source : "logger",
-                msg : "WebSocket error in client",
-                data : Array.prototype.slice.call(arguments, 0)
-            });
-        }
-        
-        function closeHandler() {
-            if (!SocketClosedErrorDisplayed) {
+            if (!socketErrorDisplayed) {
                 display({
                     id : -1,
                     time : new Date(),
                     type : "error",
                     source : "logger",
-                    msg : SocketClosedErrorMessage,
+                    msg : "WebSocket error in client",
                     data : Array.prototype.slice.call(arguments, 0)
                 });
+                socketErrorDisplayed = true;
             }
-            SocketClosedErrorDisplayed = true;
+        }
+        
+        function closeHandler() {
+            if (!socketErrorDisplayed) {
+                display({
+                    id : -1,
+                    time : new Date(),
+                    type : "error",
+                    source : "logger",
+                    msg : "WebSocket closed in client",
+                    data : Array.prototype.slice.call(arguments, 0)
+                });
+                socketErrorDisplayed = true;
+            }
         }
         
         _websocket = new WebSocket(url);
@@ -156,6 +158,7 @@ define(function (require) {
     }
         
     function initConnection() {
+        socketErrorDisplayed = false;
         displayLogHistory();
     }
     
