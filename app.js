@@ -100,7 +100,20 @@
         var theGenerator = generator.createGenerator();
 
         theGenerator.subscribe("#", function (data, envelope) {
-            logger.log("publish", envelope.channel, envelope.topic, data);
+            // envelope.topic *should* have the schema source.type.message. For example
+            // something like "photoshop.error.authenticationError". However, by
+            // splitting, then shifting, then joining the remainder, we will always
+            // get all the data into the log in some form if the schema isn't followed.
+            //
+            // Note that shifting and joining do not throw errors on empty arrays, they
+            // just produce "undefined" and empty strings, which is what we'd want in the
+            // log anyway if the schema wasn't followed properly.
+            var splitTopic = envelope.topic.split(".");
+            var source = envelope.channel + "." + splitTopic.shift();
+            var type = splitTopic.shift();
+            var message = splitTopic.join(".");
+
+            logger.log(type, source, message, data);
         });
 
         var options = {};

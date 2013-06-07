@@ -70,16 +70,17 @@ define(function (require) {
             (logEntry.dataString.search(/^[Ee]rror/) >= 0);
         
         switch (logEntry.type) {
-        case "plugin":
-            $entry.addClass(foundLogError ? "error" : "plugin");
+        case "event":
+            $entry.addClass("success");
             break;
         case "init":
             $entry.addClass("warning");
             break;
         case "action":
-        case "publish":
+        case "info":
             $entry.addClass(foundLogError ? "error" : "info");
             break;
+        case "debug":
         case "error":
             $entry.addClass("error");
             break;
