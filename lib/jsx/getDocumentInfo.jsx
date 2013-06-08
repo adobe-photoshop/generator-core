@@ -49,15 +49,6 @@ var i, desc1 = new ActionDescriptor();
 //these default to true if none specified
 var flagList = Object.keys( params.flags );
 for (i in flagList)
-  desc1.putBoolean( stringIDToTypeID( params.flags[keyList[i]] ));
-/*
-desc1.putBoolean( stringIDToTypeID( "compInfo" ), false );
-desc1.putBoolean( stringIDToTypeID( "imageInfo" ), false ); 
-desc1.putBoolean( stringIDToTypeID( "layerInfo" ), true );
+  desc1.putBoolean( stringIDToTypeID( flagList[i] ), params.flags[flagList[i]] );
 
-desc1.putBoolean( stringIDToTypeID( "expandSmartObjects" ), expandSmartObjects );
-desc1.putBoolean( stringIDToTypeID( "getTextStyles" ), getTextStyles );
-desc1.putBoolean( stringIDToTypeID( "selectedLayers" ), selectedLayers );
-desc1.putBoolean( stringIDToTypeID( "getCompSettings" ), getCompSettings ); 
-*/
 executeAction( idNS, desc1, DialogModes.NO );
