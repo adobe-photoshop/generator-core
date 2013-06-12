@@ -26,7 +26,8 @@ if (!Object.keys) {
         dontEnumsLength = dontEnums.length;
  
     return function (obj) {
-      if (typeof obj !== 'object' && typeof obj !== 'function' || obj === null) throw new TypeError('Object.keys called on non-object');
+      if (typeof obj !== 'object' && typeof obj !== 'function' || obj === null) 
+          throw new TypeError('Object.keys called on non-object');
  
       var result = [];
  
@@ -45,10 +46,11 @@ if (!Object.keys) {
 };
 
 var idNS = stringIDToTypeID( "sendDocumentInfoToNetworkClient" );
-var i, desc1 = new ActionDescriptor();
+var i, desc = new ActionDescriptor();
+desc.putString( stringIDToTypeID("version"), "1.0" );
 //these default to true if none specified
 var flagList = Object.keys( params.flags );
 for (i in flagList)
-  desc1.putBoolean( stringIDToTypeID( flagList[i] ), params.flags[flagList[i]] );
+  desc.putBoolean( stringIDToTypeID( flagList[i] ), params.flags[flagList[i]] );
 
-executeAction( idNS, desc1, DialogModes.NO );
+executeAction( idNS, desc, DialogModes.NO );
