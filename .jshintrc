@@ -1,5 +1,5 @@
 {
-   "bitwise"       : true,
+    "bitwise"       : true,
     "camelcase"     : true,
     "curly"         : true,
     "eqeqeq"        : true,
