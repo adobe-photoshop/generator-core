@@ -1,18 +1,22 @@
-/*global params, stringIDToTypeID, ActionDescriptor, executeAction, DialogModes */
-
-// Expected params:
-//   - flags: {compInfo:bool, imageInfo:bool, layerInfo:bool, 
-//             expandSmartObjects:bool, getTextStyles:bool, 
-//             selectedLayers:bool, getCompSettings:bool}
-
+/*global stringIDToTypeID, ActionDescriptor, executeAction, DialogModes */
 
 var idNS = stringIDToTypeID("sendDocumentInfoToNetworkClient");
 var k, desc = new ActionDescriptor();
 desc.putString(stringIDToTypeID("version"), "1.0");
-//these default to true if none specified
-for (k in params.flags) {
-    if (params.flags.hasOwnProperty(k)) {
-        desc.putBoolean(stringIDToTypeID(k), params.flags[k]);
+
+var flags = {
+    compInfo:           true,
+    imageInfo:          true,
+    layerInfo:          true,
+    expandSmartObjects: false,
+    getTextStyles:      true,
+    selectedLayers:     true,
+    getCompSettings:    true
+};
+
+for (k in flags) {
+    if (flags.hasOwnProperty(k)) {
+        desc.putBoolean(stringIDToTypeID(k), flags[k]);
     }
 }
 executeAction(idNS, desc, DialogModes.NO);
