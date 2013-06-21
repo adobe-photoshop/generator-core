@@ -36,6 +36,8 @@
         LOG_FILENAME = null;
 
     var optionParser = optimist["default"]({
+        "r" : "independent",
+        "m" : null,
         "p" : 49494,
         "h" : "localhost",
         "P" : "password",
@@ -49,17 +51,21 @@
     var argv = optionParser
         .usage("Run generator service.\nUsage: $0")
         .describe({
-            "p": "the Photoshop server port",
-            "h": "the Photoshop server host",
-            "P": "the Photoshop server password",
+            "r": "launch reason, one of: independent, menu, metadata, alwayson",
+            "m": "menu ID of action that should be executed immediately after startup",
+            "p": "Photoshop server port",
+            "h": "Photoshop server host",
+            "P": "Photoshop server password",
             "i": "file descriptor of input pipe",
             "o": "file descriptor of output pipe",
             "f": "folder to search for plugins (can be used multiple times)",
-            "l": "the logger server port",
-            "n": "the filename to write the log (specifying -n witout filename uses stdout)",
+            "l": "logger server port",
+            "n": "filename to write the log (specifying -n witout filename uses stdout)",
             "debuglaunch": "start debugger instead of initializing (call start() to init)",
             "help": "display help message"
         }).alias({
+            "r": "launchreason",
+            "m": "menu",
             "p": "port",
             "h": "host",
             "P": "password",
