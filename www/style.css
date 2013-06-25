@@ -1,7 +1,49 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, "Source Sans", Arial, Verdana; 
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #999;
+}
+
+th, td {
+    padding: 5px;
+}
+
+table pre {
+    border: 1px solid #999;
+    background-color: #eee;
+    padding: 5px;
+}
+
+.success {
+    background-color: #dff0d8;
+}
+
+.error {
+    background-color: #f2dede;
+}
+
+.warning {
+    background-color: #fcf8e3;
+}
+
+.info {
+    background-color: #d9edf7;
+}
+
+.hidden {
+    display: none;
+}
+
 .entry .data {
     white-space: nowrap;
     overflow-x: hidden;
-    max-width: 300px;
+    max-width: 400px;
     text-overflow: ellipsis;
 }
 
