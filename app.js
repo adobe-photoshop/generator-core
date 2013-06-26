@@ -29,6 +29,8 @@
         Q = require("q"),
         optimist = require("optimist");
 
+    require("./lib/stdlog");
+
     var HEARTBEAT_DELAY = 1000, // one second
         heartbeatCount = 0;
     

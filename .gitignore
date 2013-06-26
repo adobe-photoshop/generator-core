@@ -3,3 +3,4 @@ node_modules
 downloads/
 bin/
 package/
+logs/
