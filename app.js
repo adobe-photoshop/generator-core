@@ -230,8 +230,15 @@
     }
 
     process.on("uncaughtException", function (err) {
-        console.error(err.stack);
-        stop(-1, "uncaught exception: " + err.message);
+        if (err) {
+            if (err.stack) {
+                console.error(err.stack);
+            } else {
+                console.error(err);
+            }
+        }
+
+        stop(-1, "uncaught exception" + (err ? (": " + err.message) : "undefined"));
     });
 
     if (DEBUG_ON_LAUNCH || argv.debuglaunch) {
