@@ -150,6 +150,8 @@
                     });
                 }
 
+                theGenerator.subscribeToEvents();
+
                 deferred.resolve(theGenerator);
             },
             function (err) {
