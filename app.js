@@ -29,6 +29,8 @@
         Q = require("q"),
         optimist = require("optimist");
 
+    require("./lib/stdlog");
+
     var HEARTBEAT_DELAY = 1000, // one second
         heartbeatCount = 0;
     
@@ -36,6 +38,8 @@
         LOG_FILENAME = null;
 
     var optionParser = optimist["default"]({
+        "r" : "independent",
+        "m" : null,
         "p" : 49494,
         "h" : "localhost",
         "P" : "password",
@@ -49,17 +53,21 @@
     var argv = optionParser
         .usage("Run generator service.\nUsage: $0")
         .describe({
-            "p": "the Photoshop server port",
-            "h": "the Photoshop server host",
-            "P": "the Photoshop server password",
+            "r": "launch reason, one of: independent, menu, metadata, alwayson",
+            "m": "menu ID of action that should be executed immediately after startup",
+            "p": "Photoshop server port",
+            "h": "Photoshop server host",
+            "P": "Photoshop server password",
             "i": "file descriptor of input pipe",
             "o": "file descriptor of output pipe",
             "f": "folder to search for plugins (can be used multiple times)",
-            "l": "the logger server port",
-            "n": "the filename to write the log (specifying -n witout filename uses stdout)",
+            "l": "logger server port",
+            "n": "filename to write the log (specifying -n witout filename uses stdout)",
             "debuglaunch": "start debugger instead of initializing (call start() to init)",
             "help": "display help message"
         }).alias({
+            "r": "launchreason",
+            "m": "menu",
             "p": "port",
             "h": "host",
             "P": "password",
@@ -142,6 +150,8 @@
                     });
                 }
 
+                theGenerator.subscribeToEvents();
+
                 deferred.resolve(theGenerator);
             },
             function (err) {
@@ -222,8 +232,15 @@
     }
 
     process.on("uncaughtException", function (err) {
-        console.error(err.stack);
-        stop(-1, "uncaught exception: " + err.message);
+        if (err) {
+            if (err.stack) {
+                console.error(err.stack);
+            } else {
+                console.error(err);
+            }
+        }
+
+        stop(-1, "uncaught exception" + (err ? (": " + err.message) : "undefined"));
     });
 
     if (DEBUG_ON_LAUNCH || argv.debuglaunch) {
