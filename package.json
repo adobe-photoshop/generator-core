@@ -1,11 +1,11 @@
 {
-  "name": "generator",
+  "name": "generator-core",
   "version": "0.0.9",
-  "description": "Generator for Photoshop",
+  "description": "Photoshop Generator",
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git@git.corp.adobe.com:photoshop/generator.git"
+    "url": "https://github.com/adobe-photoshop/generator.git"
   },
   "license": "MIT",
   "readmeFilename": "README.md",
