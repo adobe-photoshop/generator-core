@@ -1,18 +1,10 @@
-/*global stringIDToTypeID, ActionDescriptor, executeAction, DialogModes */
+/*global stringIDToTypeID, ActionDescriptor, executeAction, DialogModes, params */
 
 var idNS = stringIDToTypeID("sendDocumentInfoToNetworkClient");
 var k, desc = new ActionDescriptor();
 desc.putString(stringIDToTypeID("version"), "1.0");
 
-var flags = {
-    compInfo:           true,
-    imageInfo:          true,
-    layerInfo:          true,
-    expandSmartObjects: false,
-    getTextStyles:      true,
-    selectedLayers:     true,
-    getCompSettings:    true
-};
+var flags = params.flags;
 
 for (k in flags) {
     if (flags.hasOwnProperty(k)) {
