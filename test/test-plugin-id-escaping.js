@@ -24,16 +24,17 @@
 (function () {
     "use strict";
 
-    exports.testPass = function (test) {
-        test.expect(1);
-        test.ok(true);
+    var generator        = require("../lib/generator"),
+        escapePluginId   = generator._escapePluginId,
+        unescapePluginId = generator._unescapePluginId;
+
+    exports.test = function (test) {
+        var unsafePluginId = "geneRa_tor-foo.42bar.Baz#bla borg",
+            safePluginId   = "geneRa_95_tor_45_foo_46_42bar_46_Baz_35_bla_32_borg";
+
+        test.expect(2);
+        test.strictEqual(escapePluginId(unsafePluginId), safePluginId);
+        test.strictEqual(unescapePluginId(safePluginId), unsafePluginId);
         test.done();
     };
-
-    exports.testFail = function (test) {
-        test.expect(1);
-        test.ok(false);
-        test.done();
-    };
-
 }());
