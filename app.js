@@ -31,9 +31,6 @@
 
     require("./lib/stdlog");
 
-    var HEARTBEAT_DELAY = 1000, // one second
-        heartbeatCount = 0;
-    
     var DEBUG_ON_LAUNCH = false,
         LOG_FILENAME = null;
 
@@ -124,6 +121,13 @@
             logger.log(type, source, message, data);
         });
 
+        theGenerator.subscribe("generator.shutdown", function () {
+            setTimeout(function () {
+                console.log("Exiting");
+                stop(-2, "generator shutdown event");
+            }, 1000);
+        });
+
         var options = {};
         if ((typeof argv.input === "number" && typeof argv.output === "number") ||
             (typeof argv.input === "string" && typeof argv.output === "string")) {
@@ -194,41 +198,6 @@
                 stop(-3, "generator failed to initialize: " + err);
             }
         );
-
-        // Routinely check if stdout is closed. Stdout will close when our
-        // parent process closes (either expectedly or unexpectedly) so this
-        // is our signal to shutdown to prevent process abandonment.
-        process.stdout.on("end", function () {
-            stop(-2, "received end on stdout");
-        });
-
-        process.stdout.on("error", function () {
-            stop(-2, "async error writing to stdout");
-        });
-
-        if (!process.stdout.isTTY) {
-            // We need to continually ping because that's the only way to actually
-            // check if the pipe is closed in a robust way (writable may only get
-            // set to false after trying to write a ping to a closed pipe).
-            //
-            // As an example, on OS X, doing "node app.js | cat" and then killing
-            // the cat process with "kill -9" does *not* generate an end event
-            // immediately. However, writing to the pipe generates an error event.
-            setInterval(function () {
-                if (!process.stdout.writable) {
-                    // If stdout closes, our parent process has terminated or
-                    // has explicitly closed it. Either way, we should exit.
-                    stop(-2, "stdout closed");
-                } else {
-                    try {
-                        process.stdout.write("PING " + (heartbeatCount++) + "\n");
-                    } catch (e) {
-                        stop(-2, "sync error writing to stdout");
-                    }
-                }
-            }, HEARTBEAT_DELAY);
-        }
-
     }
 
     process.on("uncaughtException", function (err) {
