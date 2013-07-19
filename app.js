@@ -29,7 +29,11 @@
         Q = require("q"),
         optimist = require("optimist");
 
-    require("./lib/stdlog");
+    require("./lib/stdlog").setup({
+        vendor:      "Adobe",
+        application: "Adobe Photoshop CC",
+        module:      "Generator"
+    });
 
     var HEARTBEAT_DELAY = 1000, // one second
         heartbeatCount = 0;
