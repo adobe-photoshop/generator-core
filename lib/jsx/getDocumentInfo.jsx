@@ -1,4 +1,4 @@
-/*global stringIDToTypeID, ActionDescriptor, executeAction, DialogModes */
+/*global stringIDToTypeID, ActionDescriptor, executeAction, DialogModes, params */
 
 var idNS = stringIDToTypeID("sendDocumentInfoToNetworkClient");
 var k, desc = new ActionDescriptor();
@@ -18,5 +18,9 @@ for (k in flags) {
     if (flags.hasOwnProperty(k)) {
         desc.putBoolean(stringIDToTypeID(k), flags[k]);
     }
+}
+
+if (params.documentId) {
+    desc.putInteger(stringIDToTypeID("documentID"), params.documentId);
 }
 executeAction(idNS, desc, DialogModes.NO);

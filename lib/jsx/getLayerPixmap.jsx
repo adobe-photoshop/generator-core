@@ -15,10 +15,11 @@ transform.putEnumerated(stringIDToTypeID("interpolation"),
                         stringIDToTypeID("interpolationType"),
                         stringIDToTypeID("automaticInterpolation"));
 
+actionDescriptor.putInteger(stringIDToTypeID("documentID"), params.documentId);
 actionDescriptor.putInteger(stringIDToTypeID("width"), MAX_DIMENSION);
 actionDescriptor.putInteger(stringIDToTypeID("height"), MAX_DIMENSION);
 actionDescriptor.putInteger(stringIDToTypeID("format"), 2);
-actionDescriptor.putInteger(stringIDToTypeID("layerID"), params.layerID);
+actionDescriptor.putInteger(stringIDToTypeID("layerID"), params.layerId);
 actionDescriptor.putObject(stringIDToTypeID("transform"), stringIDToTypeID("transform"), transform);
 
 executeAction(stringIDToTypeID("sendLayerThumbnailToNetworkClient"), actionDescriptor, DialogModes.NO);
