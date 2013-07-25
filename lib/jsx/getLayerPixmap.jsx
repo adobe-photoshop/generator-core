@@ -9,8 +9,8 @@ var MAX_DIMENSION = 10000;
 var actionDescriptor = new ActionDescriptor();
 
 var transform = new ActionDescriptor();
-transform.putInteger(stringIDToTypeID("width"), params.scale);
-transform.putInteger(stringIDToTypeID("height"), params.scale);
+transform.putDouble(stringIDToTypeID("width"), params.scaleX * 100);
+transform.putDouble(stringIDToTypeID("height"), params.scaleY * 100);
 transform.putEnumerated(stringIDToTypeID("interpolation"),
                         stringIDToTypeID("interpolationType"),
                         stringIDToTypeID("automaticInterpolation"));
