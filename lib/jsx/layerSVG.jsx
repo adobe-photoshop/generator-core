@@ -1,6 +1,6 @@
 /*global $, app, File, localize, params, svg */
 
-// Expected params:
+// Required params:
 //   - layerID: ID of layer to generate SVG info for
 //   - layerFilename: name to write the SVG file to.
 
