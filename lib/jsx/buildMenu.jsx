@@ -1,6 +1,6 @@
 /*global params, stringIDToTypeID, ActionDescriptor, ActionList, executeAction, DialogModes */
 
-// Expected params:
+// Required params:
 //   - items - array of objects that describe menu items. Each object should 
 //     have the following properties:
 //         name - string used to identify menu internally

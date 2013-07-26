@@ -1,5 +1,9 @@
 /*global stringIDToTypeID, ActionDescriptor, executeAction, DialogModes, params */
 
+// Required params: none
+// Optional params:
+//   - documentId: The ID of the document requested (leave null for current document)
+
 var idNS = stringIDToTypeID("sendDocumentInfoToNetworkClient");
 var k, desc = new ActionDescriptor();
 desc.putString(stringIDToTypeID("version"), "1.0");

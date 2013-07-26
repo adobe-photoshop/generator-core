@@ -1,8 +1,10 @@
 /*global params, stringIDToTypeID, ActionDescriptor, executeAction, DialogModes */
 
-// Expected params:
-//   - layerID: The ID of the layer requested
-//   - scale: The scale for the output pixmap
+// Required params:
+//   - documentId: The ID of the document requested
+//   - layerId: The ID of the layer requested
+//   - scaleX: The x-dimension scale factor (e.g. 0.5 for half size) for the output pixmap
+//   - scaleY: The y-dimension scale factor (e.g. 0.5 for half size) for the output pixmap
 
 var MAX_DIMENSION = 10000;
 

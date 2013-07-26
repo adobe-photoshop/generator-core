@@ -1,6 +1,6 @@
 /*global params, stringIDToTypeID, ActionDescriptor, executeAction, DialogModes */
 
-// Expected params:
+// Required params:
 //   - name: the string ID of the menu (e.g. "assets")
 //   - enabled: boolean specifying whether the menu should be enabled
 //   - checked: boolean specifying whether the menu should be checked
