@@ -1,6 +1,6 @@
 /* global params, ActionDescriptor, stringIDToTypeID, executeAction, DialogModes */
 
-// Expected params:
+// Required params:
 //   - events: Array of strings representing event names
 
 var i, actionDescriptor;
