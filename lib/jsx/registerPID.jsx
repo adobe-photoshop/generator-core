@@ -1,6 +1,6 @@
 /*global params, stringIDToTypeID, ActionDescriptor, executeAction, DialogModes */
 
-// Expected params:
+// Required params:
 //   - pid: the PID of the node process
 
 var IDStr = stringIDToTypeID("ID");
