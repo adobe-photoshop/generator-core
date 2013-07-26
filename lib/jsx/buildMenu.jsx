@@ -21,7 +21,7 @@ var menu, i;
 for (i = 0; i < params.items.length; i++) {
     menu = new ActionDescriptor();
     menu.putString(nameID, params.items[i].name);
-    menu.putString(displayNameStr, params.items[i].displayName);
+    menu.putString(displayNameStr, localize(params.items[i].displayName));
     // Because of a bug, we always add the menu item in an enabled, unchecked state
     // then set the state later.
     menu.putBoolean(enabledID, true);
