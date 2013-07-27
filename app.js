@@ -144,7 +144,7 @@
             options.password = argv.password;
         }
         
-        theGenerator.start(options).then(
+        theGenerator.start(options).done(
             function () {
                 logger.log("init", "app", "Generator started!", null);
                 
@@ -154,7 +154,12 @@
                         folders = [folders];
                     }
                     folders.forEach(function (f) {
-                        theGenerator.loadAllPluginsInDirectory(f);
+                        try {
+                            theGenerator.loadAllPluginsInDirectory(f);
+                        } catch (e) {
+                            logger.log("init", "app", "Error processing plugin directory '" + f + "'", e);
+                            console.error("Error processing plugin directory %s\n", f, e); 
+                        }
                     });
                 }
 
