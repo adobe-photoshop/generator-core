@@ -158,7 +158,7 @@
                             theGenerator.loadAllPluginsInDirectory(f);
                         } catch (e) {
                             logger.log("init", "app", "Error processing plugin directory '" + f + "'", e);
-                            console.error("Error processing plugin directory %s\n", f, e); 
+                            console.error("Error processing plugin directory %s\n", f, e);
                         }
                     });
                 }
