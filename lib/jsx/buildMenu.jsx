@@ -1,4 +1,4 @@
-/*global params, stringIDToTypeID, ActionDescriptor, ActionList, executeAction, DialogModes */
+/*global params, stringIDToTypeID, ActionDescriptor, ActionList, executeAction, DialogModes, localize */
 
 // Required params:
 //   - items - array of objects that describe menu items. Each object should 
@@ -9,7 +9,7 @@
 //         checked - boolean specifying whether the menu item should be checked initially
 
 var nameID = stringIDToTypeID("name");
-var displayNameStr = stringIDToTypeID("displayName");
+var displayNameID = stringIDToTypeID("displayName");
 var enabledID = stringIDToTypeID("enabled");
 var checkedID = stringIDToTypeID("checked");
 var nodeMenuInitializeID = stringIDToTypeID("nodeMenuInitialize");
@@ -21,7 +21,12 @@ var menu, i;
 for (i = 0; i < params.items.length; i++) {
     menu = new ActionDescriptor();
     menu.putString(nameID, params.items[i].name);
-    menu.putString(displayNameStr, params.items[i].displayName);
+    if (params.items[i].displayName.indexOf("$$$") === 0) { // PS-localizable strings start with "$$$"
+        menu.putString(displayNameID, localize(params.items[i].displayName));
+    } else {
+        menu.putString(displayNameID, params.items[i].displayName);
+    }
+
     // Because of a bug, we always add the menu item in an enabled, unchecked state
     // then set the state later.
     menu.putBoolean(enabledID, true);
