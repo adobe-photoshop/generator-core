@@ -6,6 +6,6 @@
 //   - layerScale: amount to scale SVG (value of 1 generates no scaling code).
 
 var appFolder = { Windows: "/", Macintosh: "/Adobe Photoshop CC.app/Contents/" };
-$.evalFile(app.path + appFolder[File.fs] + localize("$$$/ScriptingSupport/Required=Required") + "/ConvertSVG.jsx");
+$.evalFile(app.path + appFolder[File.fs] + localize("$$$/private/Filenames/RequiredFolder=Required") + "/ConvertSVG.jsx");
 
 svg.generateFileByID(params.layerID, params.layerFilename, params.layerScale);
