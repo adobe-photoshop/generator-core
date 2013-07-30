@@ -221,6 +221,10 @@
         stop(-1, "uncaught exception" + (err ? (": " + err.message) : "undefined"));
     });
 
+    process.on("SIGTERM", function () {
+        stop(-1, "received SIGTERM");
+    });
+
     if (DEBUG_ON_LAUNCH || argv.debuglaunch) {
         // Set a timer that will keep our process from exiting.
         var debugStartTimeout = setInterval(function () {
