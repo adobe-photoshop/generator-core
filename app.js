@@ -48,6 +48,7 @@
         "o" : null,
         "f" : null,
         "l" : 49495,
+        "S" : "on",     // Modify this to "on" or "off" to change the default SVG behavior
         "n" : null
     });
     
@@ -63,6 +64,7 @@
             "o": "file descriptor of output pipe",
             "f": "folder to search for plugins (can be used multiple times)",
             "l": "logger server port",
+            "S": "Enable SVG output",
             "n": "filename to write the log (specifying -n witout filename uses stdout)",
             "debuglaunch": "start debugger instead of initializing (call start() to init)",
             "help": "display help message"
@@ -76,6 +78,7 @@
             "o": "output",
             "f": "pluginfolder",
             "l": "loggerport",
+            "S": "SVG",
             "n": "loggerfile"
         }).argv;
     
@@ -143,6 +146,8 @@
             options.host = argv.host;
             options.password = argv.password;
         }
+        
+        theGenerator.svgEnable(argv.SVG);
         
         theGenerator.start(options).done(
             function () {
