@@ -21,43 +21,19 @@
  * 
  */
 
-module.exports = function (grunt) {
+(function () {
     "use strict";
-    
-    grunt.initConfig({
-        pkg : grunt.file.readJSON("package.json"),
 
-        platform : process.platform === "darwin" ? "mac" : "win",
+    exports.testPass = function (test) {
+        test.expect(1);
+        test.ok(true);
+        test.done();
+    };
 
-        jshint : {
-            options : {
-                jshintrc : ".jshintrc"
-            },
-            all : [
-                "*.js",
-                "package.json",
-                ".jshintrc",
-                "lib/**/*.js",
-                "lib/jsx/**/*.jsx",
-                "test/**/*.js",
-                "www/**/*.js",
-                "!www/vendor/**/*.js"
-            ]
-        },
+    exports.testFail = function (test) {
+        test.expect(1);
+        test.ok(false);
+        test.done();
+    };
 
-        nodeunit : {
-            all : ["test/test-*.js"]
-        }
-                
-    });
-
-    grunt.loadNpmTasks("grunt-contrib-jshint");
-    grunt.loadNpmTasks("grunt-contrib-nodeunit");
-
-    grunt.registerTask("default", ["jshint", "nodeunit"]);
-        
-    grunt.registerTask("package", "Create distributable Generator package with plugins", function () {
-        grunt.log.writeln("Not yet implemented");
-    });
-
-};
+}());
