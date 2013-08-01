@@ -23,17 +23,19 @@
 
 (function () {
     "use strict";
+    
+    require("./lib/stdlog").setup({
+        vendor:      "Adobe",
+        application: "Adobe Photoshop CC",
+        module:      "Generator"
+    });
+    
     var util = require("util"),
         generator = require("./lib/generator"),
         logger = require("./lib/logger"),
         Q = require("q"),
         optimist = require("optimist");
 
-    require("./lib/stdlog").setup({
-        vendor:      "Adobe",
-        application: "Adobe Photoshop CC",
-        module:      "Generator"
-    });
 
     var DEBUG_ON_LAUNCH = false,
         LOG_FILENAME = null;
