@@ -18,6 +18,8 @@
   },
   "devDependencies": {
     "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.5.4"
+    "grunt-contrib-jshint": "~0.5.4",
+    "nodeunit": "~0.8.1",
+    "grunt-contrib-nodeunit": "~0.2.0"
   }
 }

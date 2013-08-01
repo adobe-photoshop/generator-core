@@ -21,43 +21,20 @@
  * 
  */
 
-module.exports = function (grunt) {
+(function () {
     "use strict";
-    
-    grunt.initConfig({
-        pkg : grunt.file.readJSON("package.json"),
 
-        platform : process.platform === "darwin" ? "mac" : "win",
+    var generator        = require("../lib/generator"),
+        escapePluginId   = generator._escapePluginId,
+        unescapePluginId = generator._unescapePluginId;
 
-        jshint : {
-            options : {
-                jshintrc : ".jshintrc"
-            },
-            all : [
-                "*.js",
-                "package.json",
-                ".jshintrc",
-                "lib/**/*.js",
-                "lib/jsx/**/*.jsx",
-                "test/**/*.js",
-                "www/**/*.js",
-                "!www/vendor/**/*.js"
-            ]
-        },
+    exports.test = function (test) {
+        var unsafePluginId = "geneRa_tor-foo.42bar.Baz#bla borg",
+            safePluginId   = "geneRa_95_tor_45_foo_46_42bar_46_Baz_35_bla_32_borg";
 
-        nodeunit : {
-            all : ["test/test-*.js"]
-        }
-                
-    });
-
-    grunt.loadNpmTasks("grunt-contrib-jshint");
-    grunt.loadNpmTasks("grunt-contrib-nodeunit");
-
-    grunt.registerTask("default", ["jshint", "nodeunit"]);
-        
-    grunt.registerTask("package", "Create distributable Generator package with plugins", function () {
-        grunt.log.writeln("Not yet implemented");
-    });
-
-};
+        test.expect(2);
+        test.strictEqual(escapePluginId(unsafePluginId), safePluginId);
+        test.strictEqual(unescapePluginId(safePluginId), unsafePluginId);
+        test.done();
+    };
+}());
