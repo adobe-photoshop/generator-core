@@ -9,6 +9,9 @@
   },
   "license": "MIT",
   "readmeFilename": "README.md",
+  "scripts": {
+    "test": "grunt test"
+  },
   "dependencies": {
     "optimist": "~0.3.5",
     "connect": "~2.7.4",
