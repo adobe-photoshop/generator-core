@@ -57,9 +57,5 @@ module.exports = function (grunt) {
     grunt.registerTask("test", ["jshint", "nodeunit"]);
 
     grunt.registerTask("default", ["test"]);
-        
-    grunt.registerTask("package", "Create distributable Generator package with plugins", function () {
-        grunt.log.writeln("Not yet implemented");
-    });
 
 };
