@@ -29,8 +29,10 @@
         application: "Adobe Photoshop CC",
         module:      "Generator"
     });
-    
+
+
     var util = require("util"),
+        config = require("./lib/config").getConfig(),
         generator = require("./lib/generator"),
         logger = require("./lib/logger"),
         Q = require("q"),
@@ -146,6 +148,8 @@
             options.password = argv.password;
         }
         
+        options.config = config;
+
         theGenerator.start(options).done(
             function () {
                 logger.log("init", "app", "Generator started!", null);
