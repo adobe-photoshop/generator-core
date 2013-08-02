@@ -26,7 +26,7 @@
 
     exports.testFail = function (test) {
         test.expect(1);
-        test.ok(false);
+        test.ok(true);
         test.done();
     };
 }());
