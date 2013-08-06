@@ -34,13 +34,11 @@
     var util = require("util"),
         config = require("./lib/config").getConfig(),
         generator = require("./lib/generator"),
-        logger = require("./lib/logger"),
         Q = require("q"),
         optimist = require("optimist");
 
 
-    var DEBUG_ON_LAUNCH = false,
-        LOG_FILENAME = null;
+    var DEBUG_ON_LAUNCH = false;
 
     var optionParser = optimist["default"]({
         "r" : "independent",
@@ -51,8 +49,6 @@
         "i" : null,
         "o" : null,
         "f" : null,
-        "l" : 49495,
-        "n" : null
     });
     
     var argv = optionParser
@@ -66,8 +62,6 @@
             "i": "file descriptor of input pipe",
             "o": "file descriptor of output pipe",
             "f": "folder to search for plugins (can be used multiple times)",
-            "l": "logger server port",
-            "n": "filename to write the log (specifying -n witout filename uses stdout)",
             "debuglaunch": "start debugger instead of initializing (call start() to init)",
             "help": "display help message"
         }).alias({
@@ -79,8 +73,6 @@
             "i": "input",
             "o": "output",
             "f": "pluginfolder",
-            "l": "loggerport",
-            "n": "loggerfile"
         }).argv;
     
     if (argv.help) {
@@ -96,24 +88,10 @@
         process.exit(exitCode);
     }
     
-    function startLogServer() {
-        var deferred = Q.defer();
-        logger.startServer(argv.loggerport, "localhost", function (err, address) {
-            if (err) {
-                deferred.reject(err);
-            } else {
-                deferred.resolve(address);
-            }
-        });
-        return deferred.promise;
-    }
-    
     function setupGenerator() {
         var deferred = Q.defer();
         var theGenerator = generator.createGenerator();
 
-        // logger.log(type, source, message, data);
-        
         theGenerator.on("close", function () {
             setTimeout(function () {
                 console.log("Exiting");
@@ -137,7 +115,7 @@
 
         theGenerator.start(options).done(
             function () {
-                logger.log("init", "app", "Generator started!", null);
+                console.log("[init] Generator started!");
                 
                 var folders = argv.pluginfolder;
                 if (folders) {
@@ -148,7 +126,6 @@
                         try {
                             theGenerator.loadAllPluginsInDirectory(f);
                         } catch (e) {
-                            logger.log("init", "app", "Error processing plugin directory '" + f + "'", e);
                             console.error("Error processing plugin directory %s\n", f, e);
                         }
                     });
@@ -165,27 +142,10 @@
     }
     
     function init() {
-
-        // Log to file if specified
-        var logFilename = LOG_FILENAME || argv.loggerfile;
-        if (logFilename) {
-            logger.setLogFilename(logFilename);
-        }
-
         // Record command line arguments
-        logger.log("init", "app", "node version", process.versions);
-        logger.log("init", "app", "unparsed command line", process.argv);
-        logger.log("init", "app", "parsed command line", argv);
-
-        // Start async process to launch log server
-        startLogServer().done(
-            function (address) {
-                console.log("Log server running at http://localhost:" + address.port);
-            },
-            function (err) {
-                console.error("Error starting log server:", err);
-            }
-        );
+        console.log("[init] node version: %j", process.versions);
+        console.log("[init] unparsed command line: %j", process.argv);
+        console.log("[init] parsed command line: %j", argv);
                               
         // Start async process to initialize generator
         setupGenerator().done(
