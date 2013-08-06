@@ -14,8 +14,6 @@
   },
   "dependencies": {
     "optimist": "~0.3.5",
-    "connect": "~2.7.4",
-    "ws": "~0.4.25",
     "q": "0.9.6"
   },
   "devDependencies": {
