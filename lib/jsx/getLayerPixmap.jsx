@@ -23,5 +23,10 @@ actionDescriptor.putInteger(stringIDToTypeID("height"), MAX_DIMENSION);
 actionDescriptor.putInteger(stringIDToTypeID("format"), 2);
 actionDescriptor.putInteger(stringIDToTypeID("layerID"), params.layerId);
 actionDescriptor.putObject(stringIDToTypeID("transform"), stringIDToTypeID("transform"), transform);
+actionDescriptor.putEnumerated(
+    stringIDToTypeID("includeAncestors"),
+    stringIDToTypeID("includeLayers"),
+    stringIDToTypeID("includeNone")
+);
 
 executeAction(stringIDToTypeID("sendLayerThumbnailToNetworkClient"), actionDescriptor, DialogModes.NO);
