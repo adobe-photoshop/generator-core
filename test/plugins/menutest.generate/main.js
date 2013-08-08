@@ -140,7 +140,7 @@
                 "' in " + menu.delay + "ms");
         });
 
-        _generator.subscribe("photoshop.event.generatorMenuChanged", handleGeneratorMenuClicked);
+        _generator.onPhotoshopEvent("generatorMenuChanged", handleGeneratorMenuClicked);
     
     }
 
