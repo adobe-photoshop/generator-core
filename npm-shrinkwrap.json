@@ -1,0 +1,25 @@
+{
+  "name": "generator-core",
+  "version": "0.0.9",
+  "dependencies": {
+    "optimist": {
+      "version": "0.3.7",
+      "from": "optimist@~0.3.5",
+      "dependencies": {
+        "wordwrap": {
+          "version": "0.0.2",
+          "from": "wordwrap@~0.0.2"
+        }
+      }
+    },
+    "q": {
+      "version": "0.9.6",
+      "from": "q@0.9.6",
+      "resolved": "https://registry.npmjs.org/q/-/q-0.9.6.tgz"
+    },
+    "semver": {
+      "version": "2.1.0",
+      "from": "semver@"
+    }
+  }
+}
