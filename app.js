@@ -88,6 +88,55 @@
         process.exit(exitCode);
     }
     
+    function processPluginDirectory(generator, directory) {
+        // relative paths are resolved relative to the current working directory
+        var resolve = require("path").resolve,
+            fs = require("fs"),
+            absolutePath = resolve(process.cwd(), directory),
+            pluginsLoaded = 0;
+        
+        if (!fs.statSync(absolutePath).isDirectory()) {
+            console.error("Error: specified plugin path '%s' is not a directory", absolutePath);
+            return false;
+        }
+
+        console.log("Loading plugins from", absolutePath);
+
+        // First, try treating the directory as a plugin
+
+        try {
+            generator.loadPlugin(absolutePath);
+            pluginsLoaded++;
+        } catch (e1) {
+            // do nothing
+        }
+
+        // If the directory was not a plugin, then scan one level deep for plugins
+
+        if (pluginsLoaded === 0) {
+            fs.readdirSync(absolutePath)
+                .map(function (child) {
+                    return resolve(absolutePath, child);
+                })
+                .filter(function (absoluteChildPath) {
+                    return fs.statSync(absoluteChildPath).isDirectory();
+                })
+                .forEach(function (absolutePluginPath) {
+                    try {
+                        generator.loadPlugin(absolutePluginPath);
+                        pluginsLoaded++;
+                    } catch (e2) {
+                        // do nothing
+                    }
+                });
+        }
+
+        if (pluginsLoaded === 0) {
+            console.error("Error: Did not find any Generator plugins at '%s'", absolutePath);
+        }
+
+    }
+
     function setupGenerator() {
         var deferred = Q.defer();
         var theGenerator = generator.createGenerator();
@@ -124,7 +173,7 @@
                     }
                     folders.forEach(function (f) {
                         try {
-                            theGenerator.loadAllPluginsInDirectory(f);
+                            processPluginDirectory(theGenerator, f);
                         } catch (e) {
                             console.error("Error processing plugin directory %s\n", f, e);
                         }
