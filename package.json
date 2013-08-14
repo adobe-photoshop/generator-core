@@ -1,6 +1,6 @@
 {
   "name": "generator-core",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "description": "Photoshop Generator",
   "main": "app.js",
   "repository": {
