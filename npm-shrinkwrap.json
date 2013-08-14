@@ -1,6 +1,6 @@
 {
   "name": "generator-core",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "dependencies": {
     "optimist": {
       "version": "0.3.7",
@@ -14,12 +14,11 @@
     },
     "q": {
       "version": "0.9.6",
-      "from": "q@0.9.6",
-      "resolved": "https://registry.npmjs.org/q/-/q-0.9.6.tgz"
+      "from": "q@0.9.6"
     },
     "semver": {
       "version": "2.1.0",
-      "from": "semver@"
+      "from": "semver@~2.1.0"
     }
   }
 }
