@@ -191,13 +191,15 @@
     }
     
     function init() {
-        var os = require("os");
+        var os       = require("os"),
+            versions = require("./lib/versions");
+
+        versions.logPackageInformation("[init]", __dirname);
+        versions.logGitInformation("[init]", __dirname);
 
         // Record command line arguments
-        console.log("[init] node version: %j", process.versions);
-        console.log("[init] platform: %j", process.platform);
-        console.log("[init] OS: %s %s (%s)", os.type(), os.release(), os.arch());
-        require("./lib/git").logGitInformation("[init]", __dirname);
+        console.log("[init] Node.js version: %j", process.versions);
+        console.log("[init] OS: %s %s (%s), platform: %s", os.type(), os.release(), os.arch(), process.platform);
         console.log("[init] unparsed command line: %j", process.argv);
         console.log("[init] parsed command line: %j", argv);
                               
