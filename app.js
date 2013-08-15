@@ -40,6 +40,15 @@
 
     var DEBUG_ON_LAUNCH = false;
 
+    // NOTE: The connection check delay / max failures is a bit misleading. A connection check
+    // won't actually FAIL until the request times out (which is currently 20 seconds). So,
+    // it will take 20 seconds for the first failure to happen, during which time many other
+    // connection requests could be sent. Nonetheless, if 4 in a row come back as failures
+    // after over 20 seconds, it's safe to say that Photoshop is dead.
+    var CONNECTION_CHECK_DELAY = 2500, // 2.5 seconds
+        MAX_CONSECUTIVE_CONNECTION_CHECK_FAILS = 4, // exit after this many consecutive failures
+        connectionCheckFailureCount = 0;
+
     var optionParser = optimist["default"]({
         "r" : "independent",
         "m" : null,
@@ -141,6 +150,8 @@
         var deferred = Q.defer();
         var theGenerator = generator.createGenerator();
 
+        
+
         theGenerator.on("close", function () {
             setTimeout(function () {
                 console.log("Exiting");
@@ -179,6 +190,24 @@
                         }
                     });
                 }
+
+                console.log("Starting connection check loop");
+                setInterval(function () {
+                    theGenerator.checkConnection().done(
+                        function () {
+                            connectionCheckFailureCount = 0;
+                        },
+                        function () {
+                            console.warn("No response from connection check");
+                            connectionCheckFailureCount++;
+                            if (connectionCheckFailureCount >= MAX_CONSECUTIVE_CONNECTION_CHECK_FAILS) {
+                                process.nextTick(function () {
+                                    stop(-2, "max consecutive connection check failures");
+                                });
+                            }
+                        }
+                    );
+                }, CONNECTION_CHECK_DELAY);
 
                 deferred.resolve(theGenerator);
             },
