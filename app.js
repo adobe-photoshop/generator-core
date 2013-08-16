@@ -138,7 +138,7 @@
         }
 
         if (pluginsLoaded === 0) {
-            console.error("Error: Did not find any Generator plugins at '%s'", absolutePath);
+            console.error("Error: Did not find any compatible Generator plugins at '%s'", absolutePath);
         }
 
     }
