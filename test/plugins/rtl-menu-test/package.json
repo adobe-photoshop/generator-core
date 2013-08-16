@@ -1,0 +1,12 @@
+{
+  "name": "generator-rtl-menu-test",
+  "version": "0.0.1",
+  "generator-core-version": ">=1.0.0",
+  "description": "generator plugin to test RTL strings in menus",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
