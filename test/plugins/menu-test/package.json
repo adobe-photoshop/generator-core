@@ -1,6 +1,7 @@
 {
-  "name": "menutest.generate",
+  "name": "generator-menu-test",
   "version": "0.0.1",
+  "generator-core-version": ">=1.0.0",
   "description": "generator plugin to test menus",
   "main": "main.js",
   "scripts": {

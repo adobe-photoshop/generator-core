@@ -1,7 +1,8 @@
 {
-  "name": "rtlmenutest.generate",
+  "name": "generator-version-test",
   "version": "0.0.1",
-  "description": "generator plugin to test RTL strings in menus",
+  "generator-core-version": "123.456.789",
+  "description": "generator plugin to test core version dependency",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
