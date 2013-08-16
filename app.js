@@ -40,12 +40,9 @@
 
     var DEBUG_ON_LAUNCH = false;
 
-    // NOTE: The connection check delay / max failures is a bit misleading. A connection check
-    // won't actually FAIL until the request times out (which is currently 20 seconds). So,
-    // it will take 20 seconds for the first failure to happen, during which time many other
-    // connection requests could be sent. Nonetheless, if 4 in a row come back as failures
-    // after over 20 seconds, it's safe to say that Photoshop is dead.
-    var CONNECTION_CHECK_DELAY = 2500, // 2.5 seconds
+    // We should always get a SIGPIPE if Photoshop dies, which causes us to exit. If, for some reason,
+    // we don't get a SIGPIPE and aren't hearing back from Photoshop, we'll quit after 4 minutes.
+    var CONNECTION_CHECK_DELAY = 60000, // 1 minute
         MAX_CONSECUTIVE_CONNECTION_CHECK_FAILS = 4, // exit after this many consecutive failures
         connectionCheckFailureCount = 0;
 
