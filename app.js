@@ -147,7 +147,16 @@
         var deferred = Q.defer();
         var theGenerator = generator.createGenerator();
 
-        
+        // NOTE: It *should* be the case that node automatically cleans up all pipes/sockets
+        // on exit. However, on node v0.10.15 mac 64-bit there seems to be a bug where
+        // the native-side process exit hangs if node is blocked on the read of a pipe.
+        // This meant that if Generator had an unhandled exception after starting to read
+        // from PS's pipe, the node process wouldn't fully exit until PS closed the pipe.
+        process.on("exit", function () {
+            if (theGenerator) {
+                theGenerator.shutdown();
+            }
+        });
 
         theGenerator.on("close", function () {
             setTimeout(function () {
