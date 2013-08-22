@@ -24,12 +24,14 @@
 (function () {
     "use strict";
     
-    require("./lib/stdlog").setup({
+    var stdlog = require("./lib/stdlog");
+
+    stdlog.setup({
         vendor:      "Adobe",
         application: "Adobe Photoshop CC",
-        module:      "Generator"
+        module:      "Generator",
+        level:       "error"
     });
-
 
     var util = require("util"),
         config = require("./lib/config").getConfig(),
@@ -37,6 +39,7 @@
         Q = require("q"),
         optimist = require("optimist");
 
+    stdlog.processConfig(config.logging);
 
     var DEBUG_ON_LAUNCH = false;
 
