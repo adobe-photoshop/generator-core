@@ -93,6 +93,26 @@
         console.error("Exiting with code " + exitCode + ": " + reason);
         process.exit(exitCode);
     }
+
+    function startConnectionCheckLoop(theGenerator) {
+        console.log("Starting connection check loop");
+        setInterval(function () {
+            theGenerator.checkConnection().done(
+                function () {
+                    connectionCheckFailureCount = 0;
+                },
+                function () {
+                    console.warn("No response from connection check");
+                    connectionCheckFailureCount++;
+                    if (connectionCheckFailureCount >= MAX_CONSECUTIVE_CONNECTION_CHECK_FAILS) {
+                        process.nextTick(function () {
+                            stop(-2, "max consecutive connection check failures");
+                        });
+                    }
+                }
+            );
+        }, CONNECTION_CHECK_DELAY);
+    }
     
     function processPluginDirectory(generator, directory) {
         // relative paths are resolved relative to the current working directory
@@ -103,7 +123,7 @@
         
         if (!fs.statSync(absolutePath).isDirectory()) {
             console.error("Error: specified plugin path '%s' is not a directory", absolutePath);
-            return false;
+            return pluginsLoaded;
         }
 
         console.log("Loading plugins from", absolutePath);
@@ -141,6 +161,7 @@
             console.error("Error: Did not find any compatible Generator plugins at '%s'", absolutePath);
         }
 
+        return pluginsLoaded;
     }
 
     function setupGenerator() {
@@ -183,6 +204,8 @@
             function () {
                 console.log("[init] Generator started!");
                 
+                var totalPluginCount = 0;
+
                 var folders = argv.pluginfolder;
                 if (folders) {
                     if (!util.isArray(folders)) {
@@ -190,32 +213,20 @@
                     }
                     folders.forEach(function (f) {
                         try {
-                            processPluginDirectory(theGenerator, f);
+                            totalPluginCount += processPluginDirectory(theGenerator, f);
                         } catch (e) {
                             console.error("Error processing plugin directory %s\n", f, e);
                         }
                     });
                 }
 
-                console.log("Starting connection check loop");
-                setInterval(function () {
-                    theGenerator.checkConnection().done(
-                        function () {
-                            connectionCheckFailureCount = 0;
-                        },
-                        function () {
-                            console.warn("No response from connection check");
-                            connectionCheckFailureCount++;
-                            if (connectionCheckFailureCount >= MAX_CONSECUTIVE_CONNECTION_CHECK_FAILS) {
-                                process.nextTick(function () {
-                                    stop(-2, "max consecutive connection check failures");
-                                });
-                            }
-                        }
-                    );
-                }, CONNECTION_CHECK_DELAY);
-
-                deferred.resolve(theGenerator);
+                if (totalPluginCount === 0) {
+                    // Without any plugins, Generator will never do anything. So, we exit.
+                    deferred.reject("Generator requires at least one plugin to function, zero were loaded.");
+                } else {
+                    startConnectionCheckLoop(theGenerator);
+                    deferred.resolve(theGenerator);
+                }
             },
             function (err) {
                 deferred.reject(err);
