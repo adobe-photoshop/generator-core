@@ -82,8 +82,7 @@ actionDescriptor.putEnumerated(
 
 if (params.boundsOnly) {
     actionDescriptor.putBoolean(stringIDToTypeID("boundsOnly"), params.boundsOnly);
-} else if (params.bounds) {
-    actionDescriptor.putBoolean(stringIDToTypeID("bounds"), params.bounds);
 }
+actionDescriptor.putBoolean(stringIDToTypeID("bounds"), params.bounds);
 
 executeAction(stringIDToTypeID("sendLayerThumbnailToNetworkClient"), actionDescriptor, DialogModes.NO);
