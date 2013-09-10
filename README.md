@@ -8,6 +8,7 @@ Generator Core is under active development. Thorough documentation, example plug
 
 * [Image Asset Generation Plug-in](https://github.com/adobe-photoshop/generator-assets) -- A Generator Plug-in that helps users export image assets from their Photoshop files.
 * [Generator Architecture](https://github.com/adobe-photoshop/generator-core/wiki/Generator-Architecture) -- A wiki page describing the current overall architecture of Generator.
+* Thomas Krcha's [Script Your First Adobe Generator Plugin For Photoshop](http://tomkrcha.com/?p=3896)
 
 ### License
 
