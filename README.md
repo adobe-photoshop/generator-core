@@ -11,8 +11,8 @@ Generator Core is under active development. Thorough documentation, example plug
 
 ### Developing Generator Plug-ins
 
-* Thomas Krcha's [Script Your First Adobe Generator Plugin For Photoshop](http://tomkrcha.com/?p=3896)
-* Thomas Krcha's [Sample Plug-in](https://github.com/tomkrcha/generator-getting-started/)
+* Tom Krcha's [Script Your First Adobe Generator Plugin For Photoshop](http://tomkrcha.com/?p=3896)
+* Tom Krcha's [Sample Plug-in](https://github.com/tomkrcha/generator-getting-started/)
 
 ### License
 
