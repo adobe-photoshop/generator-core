@@ -79,6 +79,11 @@ actionDescriptor.putEnumerated(
     stringIDToTypeID("includeLayers"),
     stringIDToTypeID("includeNone")
 );
+actionDescriptor.putEnumerated(
+    stringIDToTypeID("includeAdjustors"),
+    stringIDToTypeID("includeLayers"),
+    stringIDToTypeID("includeVisible")
+);
 
 if (params.boundsOnly) {
     actionDescriptor.putBoolean(stringIDToTypeID("boundsOnly"), params.boundsOnly);
