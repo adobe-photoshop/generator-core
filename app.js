@@ -38,14 +38,6 @@
         optimist = require("optimist");
 
 
-    var DEBUG_ON_LAUNCH = false;
-
-    // We should always get a SIGPIPE if Photoshop dies, which causes us to exit. If, for some reason,
-    // we don't get a SIGPIPE and aren't hearing back from Photoshop, we'll quit after 4 minutes.
-    var CONNECTION_CHECK_DELAY = 60000, // 1 minute
-        MAX_CONSECUTIVE_CONNECTION_CHECK_FAILS = 4, // exit after this many consecutive failures
-        connectionCheckFailureCount = 0;
-
     var optionParser = optimist["default"]({
         "r" : "independent",
         "m" : null,
@@ -68,7 +60,6 @@
             "i": "file descriptor of input pipe",
             "o": "file descriptor of output pipe",
             "f": "folder to search for plugins (can be used multiple times)",
-            "debuglaunch": "start debugger instead of initializing (call start() to init)",
             "help": "display help message"
         }).alias({
             "r": "launchreason",
@@ -94,26 +85,6 @@
         process.exit(exitCode);
     }
 
-    function startConnectionCheckLoop(theGenerator) {
-        console.log("Starting connection check loop");
-        setInterval(function () {
-            theGenerator.checkConnection().done(
-                function () {
-                    connectionCheckFailureCount = 0;
-                },
-                function () {
-                    console.warn("No response from connection check");
-                    connectionCheckFailureCount++;
-                    if (connectionCheckFailureCount >= MAX_CONSECUTIVE_CONNECTION_CHECK_FAILS) {
-                        process.nextTick(function () {
-                            stop(-2, "max consecutive connection check failures");
-                        });
-                    }
-                }
-            );
-        }, CONNECTION_CHECK_DELAY);
-    }
-    
     function processPluginDirectory(generator, directory) {
         // relative paths are resolved relative to the current working directory
         var resolve = require("path").resolve,
@@ -231,7 +202,6 @@
                     // Without any plugins, Generator will never do anything. So, we exit.
                     deferred.reject("Generator requires at least one plugin to function, zero were loaded.");
                 } else {
-                    startConnectionCheckLoop(theGenerator);
                     deferred.resolve(theGenerator);
                 }
             },
@@ -279,27 +249,6 @@
         stop(-1, "uncaught exception" + (err ? (": " + err.message) : "undefined"));
     });
 
-    if (DEBUG_ON_LAUNCH || argv.debuglaunch) {
-        // Set a timer that will keep our process from exiting.
-        var debugStartTimeout = setInterval(function () {
-            console.error("hit debugger init timeout");
-        }, 100000);
-
-        // Put a function in the global namespace that runs "init". Needs
-        // to call init on the event loop so that it can be debugged (code that
-        // runs from the REPL/console cannot be debugged).
-        global.start = function () {
-            clearTimeout(debugStartTimeout);
-            process.nextTick(function () {
-                init();
-            });
-        };
-
-        // Start the debugger
-        process._debugProcess(process.pid);
-    } else {
-        // Not debugging on launch, so start normally
-        init();
-    }
+    init();
 
 }());
