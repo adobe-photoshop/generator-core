@@ -130,11 +130,13 @@
 
         // First, try treating the directory as a plugin
 
+        var firstException = null;
+
         try {
             generator.loadPlugin(absolutePath);
             pluginsLoaded++;
         } catch (e1) {
-            // do nothing
+            firstException = e1;
         }
 
         // If the directory was not a plugin, then scan one level deep for plugins
@@ -152,12 +154,17 @@
                         generator.loadPlugin(absolutePluginPath);
                         pluginsLoaded++;
                     } catch (e2) {
-                        // do nothing
+                        if (!firstException) {
+                            firstException = e2;
+                        }
                     }
                 });
         }
 
         if (pluginsLoaded === 0) {
+            if (firstException) {
+                console.error(firstException);
+            }
             console.error("Error: Did not find any compatible Generator plugins at '%s'", absolutePath);
         }
 
