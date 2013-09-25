@@ -23,6 +23,16 @@
 
 (function () {
     "use strict";
+
+    var utils = require("./lib/utils");
+
+    // On Windows, the bullet character is sometimes replaced with the bell character BEL (0x07).
+    // This causes Windows to make a beeping noise every time • is printed to the console.
+    // Use · instead. This needs to happen before adding stdlog to not affect the log files.
+    if (process.platform === "win32") {
+        utils.filterWriteStream(process.stdout, utils.replaceBullet);
+        utils.filterWriteStream(process.stderr, utils.replaceBullet);
+    }
     
     require("./lib/stdlog").setup({
         vendor:      "Adobe",
