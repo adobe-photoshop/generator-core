@@ -135,6 +135,7 @@
                         generator.loadPlugin(absolutePluginPath);
                         pluginsLoaded++;
                     } catch (e2) {
+                        console.error(e2);
                         if (!firstException) {
                             firstException = e2;
                         }
