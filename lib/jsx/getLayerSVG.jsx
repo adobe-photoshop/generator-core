@@ -280,7 +280,7 @@ svg.addGradientOverlay = function ()
 {
     var gradOverlay = this.getLayerAttr("layerEffects.gradientFill");
     
-    if (gradOverlay && gradOverlay.getVal("enabled")) {
+    if (gradOverlay && this.getLayerAttr("layerFXVisible") && gradOverlay.getVal("enabled")) {
         return this.getGradient(true);  // Explictly ask for layerFX gradient
     }
     return null;
@@ -312,7 +312,7 @@ svg.psModeToSVGmode = function (psMode)
 svg.addColorOverlay = function ()
 {
     var overDesc = this.getLayerAttr("layerEffects.solidFill");
-    if (overDesc && overDesc.getVal("enabled"))
+    if (overDesc && overDesc.getVal("enabled") && this.getLayerAttr("layerFXVisible"))
     {
         var params = { filterTag: "Filter_" + this.filterID++,
                        color: this.currentLayer.replaceDescKey('flood-color="$color$"', overDesc)[1],
@@ -336,7 +336,7 @@ svg.addColorOverlay = function ()
 svg.addInnerShadow = function ()
 {
     var inshDesc = this.getLayerAttr("layerEffects.innerShadow");
-    if (inshDesc && inshDesc.getVal("enabled"))
+    if (inshDesc && inshDesc.getVal("enabled") && this.getLayerAttr("layerFXVisible"))
     {
         var mode = this.psModeToSVGmode(inshDesc.getVal("mode"));
         // Some of the PS modes don't do anything with this effect
@@ -432,7 +432,7 @@ svg.addLayerFX = function ()
 
 svg.addOpacity = function (combine)
 {
-    var colorOver = this.getLayerAttr("layerEffects.solidFill.enabled");
+    var colorOver = this.getLayerAttr("layerEffects.solidFill.enabled") && this.getLayerAttr("layerFXVisible");
     combine = (colorOver || (typeof combine === "undefined")) ? false : combine;
     var fillOpacity = this.getLayerAttr("fillOpacity") / 255;
     // Color overlay replaces fill opacity if it's enabled.
