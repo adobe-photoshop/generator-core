@@ -9,7 +9,7 @@
 /* jshint bitwise: false, strict: false, quotmark: false, forin: false,
    multistr: true, laxbreak: true, maxlen: 255, esnext: true */
 /* global $, app, File, ActionDescriptor, executeAction, PSLayerInfo,
-   DialogModes, cssToClip, stripUnits, round1k, GradientStop, 
+   DialogModes, cssToClip, stripUnits, round1k, GradientStop, stringIDToTypeID,
    Folder, kAdjustmentSheet, kLayerGroupSheet, kHiddenSectionBounder, kVectorSheet,
    kTextSheet, kPixelSheet, Units, params, runGetLayerSVGfromScript */
 /* exported runCopyCSSFromScript */
@@ -45,6 +45,7 @@ svg.reset = function ()
     this.gradientID = 0;
     this.filterID = 0;
     this.groupLevel = 0;
+    this.savedColorMode = null;
     this.currentLayer = null;
     this.saveUnits = null;
     this.startTime = 0;
@@ -71,6 +72,30 @@ svg.HTMLEncode = function (str)
                         ? "&#" + c.charCodeAt() + ";" : str[i];
     }
     return result.join("");
+};
+
+// Switch document color mode
+// Modes: "RGBColorMode", "CMYKColorMode", "labColorMode"
+svg.changeColorMode = function (dstMode)
+{
+	var sid = stringIDToTypeID;
+	// Add the "Mode" suffix if it's missing
+	if (! dstMode.match(/Mode$/)) {
+		dstMode += "Mode";
+    }
+	var desc = new ActionDescriptor();
+	desc.putClass(sid("to"), sid(dstMode));
+	desc.putBoolean(sid("merge"), false);
+	desc.putBoolean(sid("rasterize"), false);
+	executeAction(sid("convertMode"), desc, DialogModes.NO);
+};
+
+svg.documentColorMode = function ()
+{
+	// Reports "colorSpace:CMYKColorEnum", "colorSpace:RGBColor", "colorSpace:labColor"
+	var s = cssToClip.getDocAttr("mode");
+	s = s.replace(/^colorSpace:/, "").replace(/Enum$/, "");	// Strip off excess
+	return s;
 };
 
 // Encode data as Base64.
@@ -963,6 +988,13 @@ svg.pushUnits = function ()
     this.saveUnits = app.preferences.rulerUnits;
     app.preferences.rulerUnits = Units.PIXELS;  // Web dudes want pixels.
     this.startTime = new Date();
+	var mode = this.documentColorMode();
+	this.savedColorMode = null;
+	// Support labColor & CMYK as well
+	if ((mode !== "RGBColor") && (mode in {"labColor": 1, "CMYKColor": 1})) {
+		this.savedColorMode = mode;
+		this.changeColorMode("RGBColor");
+	}
 };
 
 svg.popUnits = function ()
@@ -970,6 +1002,10 @@ svg.popUnits = function ()
     if (this.saveUnits) {
         app.preferences.rulerUnits = this.saveUnits;
     }
+	if (this.savedColorMode) {
+		this.changeColorMode(this.savedColorMode);
+    }
+
     var elapsedTime = new Date() - this.startTime;
     return ("time: " + (elapsedTime / 1000.0) + " sec");
 };
