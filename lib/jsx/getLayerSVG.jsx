@@ -98,31 +98,8 @@ svg.documentColorMode = function ()
 	return s;
 };
 
-// Encode data as Base64.
-svg.encodeBase64 = function (src)
-{
-    var base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-    var i, c0, c1, c2, e0, e1, e2, e3, dst = "";
- 
-    for (i = 0; i < src.length;)
-    {
-        c0 = src.charCodeAt(i++);
-        c1 = src.charCodeAt(i++);
-        c2 = src.charCodeAt(i++);
-
-        e0 = c0 >> 2;
-        e1 = ((c0 & 3) << 4) | (c1 >> 4);
-        e2 = (i - 2 >= src.length) ? 64 : (((c1 & 15) << 2) | (c2 >> 6));
-        e3 = (i - 1 >= src.length) ? 64 : (c2 & 63);
-
-        dst = dst + base64chars[e0] + base64chars[e1]
-                  + base64chars[e2] + base64chars[e3];
-    }
-
-    return dst;
-};
-
 // Call internal PS code to write the current layer's pixels and convert it to PNG.
+// Note this takes care of encoding it into base64 format (ES is too slow at this).
 svg.writeLayerPNGfile = function (path)
 {
     var desc = new ActionDescriptor();
@@ -878,11 +855,11 @@ svg.getImageLayerSVGdata = function ()
 {
     var pngPath = new File(Folder.temp + "/png4svg" + this.currentLayer.layerID).fsName;
     this.writeLayerPNGfile(pngPath);
-
-    var pngFile = new File(pngPath + ".png");
+    var pngFile = new File(pngPath + ".base64");
     pngFile.open('r');
-    pngFile.encoding = "BINARY";
-    var pngData64 = this.encodeBase64(pngFile.read());
+    pngFile.encoding = "UTF-8";
+
+    var pngData64 = pngFile.read();
     pngFile.close();
     pngFile.remove();
     this.addParam('xlink:href', "data:img/png;base64," + pngData64);
