@@ -11,7 +11,7 @@
 /* global $, app, File, ActionDescriptor, executeAction, PSLayerInfo,
    DialogModes, cssToClip, stripUnits, round1k, GradientStop, stringIDToTypeID,
    Folder, kAdjustmentSheet, kLayerGroupSheet, kHiddenSectionBounder, kVectorSheet,
-   kTextSheet, kPixelSheet, Units, params, runGetLayerSVGfromScript */
+   kTextSheet, kPixelSheet, kSmartObjectSheet, Units, params, runGetLayerSVGfromScript */
 /* exported runCopyCSSFromScript */
 
 // This uses many routines from CopyCSS, so load the script but tell it not to execute first.
