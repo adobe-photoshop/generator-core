@@ -951,6 +951,7 @@ svg.processLayer = function (layer)
     {
     case kVectorSheet:      this.getShapeLayerSVG();    return true;
     case kTextSheet:        this.getTextLayerSVG();     return true;
+    case kSmartObjectSheet:
     case kPixelSheet:       this.getImageLayerSVG();    return true;
     case kAdjustmentSheet:  this.getAdjustmentLayerSVG(); return true;
     case kLayerGroupSheet:  this.getGroupLayerSVG();    return true;
