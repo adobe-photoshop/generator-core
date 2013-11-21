@@ -11,7 +11,7 @@
 /* global $, app, File, ActionDescriptor, executeAction, PSLayerInfo,
    DialogModes, cssToClip, stripUnits, round1k, GradientStop, stringIDToTypeID,
    Folder, kAdjustmentSheet, kLayerGroupSheet, kHiddenSectionBounder, kVectorSheet,
-   kTextSheet, kPixelSheet, Units, params, runGetLayerSVGfromScript */
+   kTextSheet, kPixelSheet, kSmartObjectSheet, Units, params, runGetLayerSVGfromScript */
 /* exported runCopyCSSFromScript */
 
 // This uses many routines from CopyCSS, so load the script but tell it not to execute first.
@@ -562,7 +562,7 @@ svg.getShapeLayerSVG = function ()
     var gradOverlayID = this.addGradientOverlay();
 
     // For now, Everything Is A Path.  We'll revisit this when shape meta-data is available.
-    this.addText("<path");
+    this.addText("<path fill-rule=\"evenodd\" ");
     
     // If there's a gradient overlay effect, the stroke must be added there.
     if (! gradOverlayID) {
@@ -951,6 +951,7 @@ svg.processLayer = function (layer)
     {
     case kVectorSheet:      this.getShapeLayerSVG();    return true;
     case kTextSheet:        this.getTextLayerSVG();     return true;
+    case kSmartObjectSheet:
     case kPixelSheet:       this.getImageLayerSVG();    return true;
     case kAdjustmentSheet:  this.getAdjustmentLayerSVG(); return true;
     case kLayerGroupSheet:  this.getGroupLayerSVG();    return true;
