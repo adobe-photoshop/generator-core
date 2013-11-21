@@ -11,6 +11,10 @@
 //   Or use relative scaling by specifying horizontal and vertical factors:
 //   - scaleX:     The x-dimension scale factor (e.g. 0.5 for half size) for the output pixmap
 //   - scaleY:     The y-dimension scale factor (e.g. 0.5 for half size) for the output pixmap
+//
+// Optional params:
+//   - useSmartScaling: setting to "true" causes shapes to be scaled in the "smart" way, which (confusingly)
+//         means that stroke effects (e.g. rounded rect corners) are *not* scaled. (Default: false)
 
 var MAX_DIMENSION = 10000;
 
@@ -20,6 +24,10 @@ var actionDescriptor = new ActionDescriptor(),
 // Add a transform if necessary
 if (params.inputRect && params.outputRect) {
     transform = new ActionDescriptor();
+
+    if (!params.useSmartScaling) {
+        transform.putBoolean(stringIDToTypeID("forceDumbScaling"), true);
+    }
 
     // The part of the document to use
     var inputRect   = params.inputRect,
@@ -57,7 +65,11 @@ if (params.inputRect && params.outputRect) {
 }
 else if (params.scaleX && params.scaleY && (params.scaleX !== 1 || params.scaleY !== 1)) {
     transform = new ActionDescriptor();
-    
+
+    if (!params.useSmartScaling) {
+        transform.putBoolean(stringIDToTypeID("forceDumbScaling"), true);
+    }
+
     transform.putDouble(stringIDToTypeID("width"), params.scaleX * 100);
     transform.putDouble(stringIDToTypeID("height"), params.scaleY * 100);
     transform.putEnumerated(stringIDToTypeID("interpolation"),
