@@ -301,6 +301,7 @@ svg.replaceFilterKeys = function (filterStr, params)
 
 svg.psModeToSVGmode = function (psMode)
 {
+	psMode = psMode.replace(/^blendMode[:]\s*/,""); // Remove enum class
     var modeMap = { 'colorBurn': null, 'linearBurn': 'multiply', 'darkenColor': null, 'multiply': 'multiply',
                     'lighten': 'lighten', 'screen': 'screen', 'colorDodge': null, 'linearDodge': 'lighten',
                     'lighterColor': 'normal', 'normal': 'normal', 'overlay': null, 'softLight': null,
