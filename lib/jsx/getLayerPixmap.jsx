@@ -15,6 +15,8 @@
 // Optional params:
 //   - useSmartScaling: setting to "true" causes shapes to be scaled in the "smart" way, which (confusingly)
 //         means that stroke effects (e.g. rounded rect corners) are *not* scaled. (Default: false)
+//   - includeAncestorMasks: setting to "true" causes exported layer to be clipped by any ancestor
+//         masks that are visible (Default: false)
 
 var MAX_DIMENSION = 10000;
 
@@ -86,11 +88,21 @@ actionDescriptor.putInteger(stringIDToTypeID("width"), MAX_DIMENSION);
 actionDescriptor.putInteger(stringIDToTypeID("height"), MAX_DIMENSION);
 actionDescriptor.putInteger(stringIDToTypeID("format"), 2);
 actionDescriptor.putInteger(stringIDToTypeID("layerID"), params.layerId);
-actionDescriptor.putEnumerated(
-    stringIDToTypeID("includeAncestors"),
-    stringIDToTypeID("includeLayers"),
-    stringIDToTypeID("includeNone")
-);
+
+if (!params.includeAncestorMasks) {
+    actionDescriptor.putEnumerated(
+        stringIDToTypeID("includeAncestors"),
+        stringIDToTypeID("includeLayers"),
+        stringIDToTypeID("includeNone")
+    );
+} else {
+    actionDescriptor.putEnumerated(
+        stringIDToTypeID("includeAncestors"),
+        stringIDToTypeID("includeLayers"),
+        stringIDToTypeID("includeVisible")
+    );
+}
+
 actionDescriptor.putEnumerated(
     stringIDToTypeID("includeAdjustors"),
     stringIDToTypeID("includeLayers"),
