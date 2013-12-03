@@ -26,6 +26,8 @@
 
     var utils = require("./lib/utils");
 
+    var PLUGIN_KEY_PREFIX = "PLUGIN-";
+
     // On Windows, the bullet character is sometimes replaced with the bell character BEL (0x07).
     // This causes Windows to make a beeping noise every time • is printed to the console.
     // Use · instead. This needs to happen before adding stdlog to not affect the log files.
@@ -95,62 +97,86 @@
         process.exit(exitCode);
     }
 
-    function processPluginDirectory(generator, directory) {
-        // relative paths are resolved relative to the current working directory
-        var resolve = require("path").resolve,
-            fs = require("fs"),
-            absolutePath = resolve(process.cwd(), directory),
-            pluginsLoaded = 0;
-        
-        if (!fs.statSync(absolutePath).isDirectory()) {
-            console.error("Error: specified plugin path '%s' is not a directory", absolutePath);
-            return pluginsLoaded;
-        }
+    function scanPluginDirectories(folders, theGenerator) {
+        var allPlugins = [];
 
-        console.log("Loading plugins from", absolutePath);
+        function listPluginsInDirectory(directory) {
 
-        // First, try treating the directory as a plugin
+            function verifyPluginAtPath(absolutePath) {
+                var result = null,
+                    metadata = null,
+                    compatibility = null;
 
-        var firstException = null;
-
-        try {
-            generator.loadPlugin(absolutePath);
-            pluginsLoaded++;
-        } catch (e1) {
-            firstException = e1;
-        }
-
-        // If the directory was not a plugin, then scan one level deep for plugins
-
-        if (pluginsLoaded === 0) {
-            fs.readdirSync(absolutePath)
-                .map(function (child) {
-                    return resolve(absolutePath, child);
-                })
-                .filter(function (absoluteChildPath) {
-                    return fs.statSync(absoluteChildPath).isDirectory();
-                })
-                .forEach(function (absolutePluginPath) {
-                    try {
-                        generator.loadPlugin(absolutePluginPath);
-                        pluginsLoaded++;
-                    } catch (e2) {
-                        console.error(e2);
-                        if (!firstException) {
-                            firstException = e2;
-                        }
+                try {
+                    metadata = theGenerator.getPluginMetadata(absolutePath);
+                    compatibility = theGenerator.checkPluginCompatibility(metadata);
+                    if (compatibility.compatible) {
+                        result = {
+                            path: absolutePath,
+                            metadata: metadata
+                        };
                     }
-                });
-        }
-
-        if (pluginsLoaded === 0) {
-            if (firstException) {
-                console.error(firstException);
+                } catch (metadataLoadError) {
+                    // Do nothing
+                }
+                return result;
             }
-            console.error("Error: Did not find any compatible Generator plugins at '%s'", absolutePath);
+
+            // relative paths are resolved relative to the current working directory
+            var resolve = require("path").resolve,
+                fs = require("fs"),
+                absolutePath = resolve(process.cwd(), directory),
+                plugins = [],
+                potentialPlugin = null;
+            
+            if (!fs.statSync(absolutePath).isDirectory()) {
+                console.error("Error: specified plugin path '%s' is not a directory", absolutePath);
+                return plugins;
+            }
+
+            console.log("Scanning for plugins in", absolutePath);
+
+            // First, try treating the directory as a plugin
+
+            potentialPlugin = verifyPluginAtPath(absolutePath);
+            if (potentialPlugin) {
+                plugins.push(potentialPlugin);
+            }
+
+            // If we didn't find a compatible plugin at the root level,
+            // then scan one level deep for plugins
+            if (plugins.length === 0) {
+                fs.readdirSync(absolutePath)
+                    .map(function (child) {
+                        return resolve(absolutePath, child);
+                    })
+                    .filter(function (absoluteChildPath) {
+                        return fs.statSync(absoluteChildPath).isDirectory();
+                    })
+                    .forEach(function (absolutePluginPath) {
+                        potentialPlugin = verifyPluginAtPath(absolutePluginPath);
+                        if (potentialPlugin) {
+                            plugins.push(potentialPlugin);
+                        }
+                    });
+            }
+
+            return plugins;
         }
 
-        return pluginsLoaded;
+        if (!util.isArray(folders)) {
+            folders = [folders];
+        }
+
+        folders.forEach(function (f) {
+            try {
+                allPlugins = allPlugins.concat(listPluginsInDirectory(f));
+            } catch (e) {
+                console.error("Error processing plugin directory %s\n", f, e);
+            }
+        });
+
+        return allPlugins;
     }
 
     function setupGenerator() {
@@ -193,21 +219,53 @@
             function () {
                 console.log("[init] Generator started!");
                 
-                var totalPluginCount = 0;
+                var semver = require("semver"),
+                    totalPluginCount = 0,
+                    pluginMap = {},
+                    plugins = scanPluginDirectories(argv.pluginfolder, theGenerator);
 
-                var folders = argv.pluginfolder;
-                if (folders) {
-                    if (!util.isArray(folders)) {
-                        folders = [folders];
+                // Ensure all plugins have a valid semver, then put them in to a map
+                // keyed on plugin name
+                plugins.forEach(function (p) {
+                    if (!semver.valid(p.metadata.version)) {
+                        p.metadata.version = "0.0.0";
                     }
-                    folders.forEach(function (f) {
-                        try {
-                            totalPluginCount += processPluginDirectory(theGenerator, f);
-                        } catch (e) {
-                            console.error("Error processing plugin directory %s\n", f, e);
-                        }
+                    if (!pluginMap[PLUGIN_KEY_PREFIX + p.metadata.name]) {
+                        pluginMap[PLUGIN_KEY_PREFIX + p.metadata.name] = [];
+                    }
+                    pluginMap[PLUGIN_KEY_PREFIX + p.metadata.name].push(p);
+                });
+
+                // For each unique plugin name, try to load a plugin with that name
+                // in decending order of version
+                Object.keys(pluginMap).forEach(function (pluginSetKey) {
+                    var pluginSet = pluginMap[pluginSetKey],
+                        i,
+                        loaded = false;
+
+                    pluginSet.sort(function (a, b) {
+                        return semver.rcompare(a.metadata.version, b.metadata.version);
                     });
-                }
+
+                    console.log("Processing plugin set: " + JSON.stringify(pluginSet));
+
+                    for (i = 0; i < pluginSet.length; i++) {
+                        try {
+                            theGenerator.loadPlugin(pluginSet[i].path);
+                            loaded = true;
+                        } catch (loadingException) {
+                            console.error("Unable to load plugin at '" + pluginSet[i].path + "': " +
+                                loadingException.message);
+                        }
+
+                        if (loaded) {
+                            totalPluginCount++;
+                            break;
+                        }
+                    }
+
+                });
+
 
                 if (totalPluginCount === 0) {
                     // Without any plugins, Generator will never do anything. So, we exit.
