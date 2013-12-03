@@ -1,0 +1,12 @@
+{
+  "name": "generator-multi-plugin-test",
+  "version": "0.2.0",
+  "generator-core-version": "~2",
+  "description": "generator plugin to test loading correct version if multiple versions exist",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
