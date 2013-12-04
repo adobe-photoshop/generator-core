@@ -116,6 +116,11 @@
                             metadata: metadata
                         };
                     }
+
+                    if (compatibility.message) {
+                        console.warn("Potential problem with plugin at '" + absolutePath +
+                            "': " + compatibility.message);
+                    }
                 } catch (metadataLoadError) {
                     // Do nothing
                 }
@@ -170,7 +175,12 @@
 
         folders.forEach(function (f) {
             try {
+                var currentPluginCount = allPlugins.length;
                 allPlugins = allPlugins.concat(listPluginsInDirectory(f));
+                if (currentPluginCount === allPlugins.length) {
+                    // No plugins found in this directory
+                    console.warn("No viable plugins were found in '" + f + "'");
+                }
             } catch (e) {
                 console.error("Error processing plugin directory %s\n", f, e);
             }
