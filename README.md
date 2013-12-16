@@ -1,6 +1,6 @@
 ## Generator Core [![Build Status](https://travis-ci.org/adobe-photoshop/generator-core.png?branch=master)](https://travis-ci.org/adobe-photoshop/generator-core)
 
-Generator is a JavaScript-based extensibility technology shipping soon for Adobe Photoshop CC. This repository contains Generator Core, a Node.js library that handles communication between Photoshop and Generator Plug-ins.
+Generator is a JavaScript-based extensibility technology which recently shipped in Adobe Photoshop CC v14.1. This repository contains Generator Core, a Node.js library that handles communication between Photoshop and Generator Plug-ins.
 
 ### Status
 
