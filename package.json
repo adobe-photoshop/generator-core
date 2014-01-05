@@ -10,7 +10,7 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "scripts": {
-    "test": "grunt test"
+    "test": "./node_modules/.bin/grunt test"
   },
   "dependencies": {
     "optimist": "~0.3.5",
@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "grunt": "~0.4.1",
+    "grunt-cli": "~0.1.11",
     "grunt-contrib-jshint": "~0.5.4",
     "nodeunit": "~0.8.1",
     "grunt-contrib-nodeunit": "~0.2.0"
