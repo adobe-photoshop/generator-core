@@ -24,8 +24,6 @@
 (function () {
     "use strict";
 
-    process.title = "generator";
-
     var utils = require("./lib/utils");
 
     var PLUGIN_KEY_PREFIX = "PLUGIN-";
