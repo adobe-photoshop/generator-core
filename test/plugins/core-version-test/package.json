@@ -1,0 +1,12 @@
+{
+  "name": "core-version-test",
+  "version": "0.0.1",
+  "generator-core-version": ">=1.0.0",
+  "description": "generator plugin to test Generator.prototype.version property added in 2.0.2",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
