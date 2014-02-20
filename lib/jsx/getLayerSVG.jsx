@@ -25,7 +25,7 @@ if (typeof cssToClip === "undefined")
 const ksendLayerThumbnailToNetworkClientStr = app.stringIDToTypeID("sendLayerThumbnailToNetworkClient");
 const krawPixmapFilePathStr = app.stringIDToTypeID("rawPixmapFilePath");
 const kformatStr = app.stringIDToTypeID("format");
-const kselectedLayerStr = app.stringIDToTypeID("selectedLayer");
+// const kselectedLayerStr = app.stringIDToTypeID("selectedLayer");
 const kwidthStr = app.stringIDToTypeID("width");
 const kheightStr = app.stringIDToTypeID("height");
 const kboundsStr = app.stringIDToTypeID("bounds");
