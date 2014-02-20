@@ -1,24 +1,32 @@
 {
   "name": "generator-core",
-  "version": "1.0.0",
+  "version": "2.0.3-dev",
   "dependencies": {
     "optimist": {
-      "version": "0.3.7",
-      "from": "optimist@~0.3.5",
+      "version": "0.6.1",
+      "from": "optimist@~0.6",
+      "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.6.1.tgz",
       "dependencies": {
         "wordwrap": {
           "version": "0.0.2",
           "from": "wordwrap@~0.0.2"
+        },
+        "minimist": {
+          "version": "0.0.7",
+          "from": "minimist@~0.0.1",
+          "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.7.tgz"
         }
       }
     },
     "q": {
-      "version": "0.9.6",
-      "from": "q@0.9.6"
+      "version": "1.0.0",
+      "from": "q@~1.0",
+      "resolved": "https://registry.npmjs.org/q/-/q-1.0.0.tgz"
     },
     "semver": {
-      "version": "2.1.0",
-      "from": "semver@~2.1.0"
+      "version": "2.2.1",
+      "from": "semver@~2.2",
+      "resolved": "https://registry.npmjs.org/semver/-/semver-2.2.1.tgz"
     }
   }
 }

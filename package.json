@@ -13,14 +13,14 @@
     "test": "node node_modules/.bin/nodeunit test"
   },
   "dependencies": {
-    "optimist": "~0.3.5",
-    "q": "0.9.6",
-    "semver": "~2.1.0"
+    "optimist": "~0.6",
+    "q": "~1.0",
+    "semver": "~2.2"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.5.4",
-    "nodeunit": "~0.8.1",
-    "grunt-contrib-nodeunit": "~0.2.0"
+    "grunt": "~0.4",
+    "grunt-contrib-jshint": "~0.8",
+    "nodeunit": "~0.8",
+    "grunt-contrib-nodeunit": "~0.3"
   }
 }
