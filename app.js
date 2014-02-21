@@ -139,8 +139,6 @@
                 return plugins;
             }
 
-            console.log("Scanning for plugins in", absolutePath);
-
             // First, try treating the directory as a plugin
 
             potentialPlugin = verifyPluginAtPath(absolutePath);
@@ -206,8 +204,7 @@
 
         theGenerator.on("close", function () {
             setTimeout(function () {
-                console.log("Exiting");
-                stop(0, "generator close event");
+                stop(0, "Generator close event");
             }, 1000);
         });
 
@@ -227,8 +224,6 @@
 
         theGenerator.start(options).done(
             function () {
-                console.log("[init] Generator started!");
-                
                 var semver = require("semver"),
                     totalPluginCount = 0,
                     pluginMap = {},
@@ -256,8 +251,6 @@
                     pluginSet.sort(function (a, b) {
                         return semver.rcompare(a.metadata.version, b.metadata.version);
                     });
-
-                    console.log("Processing plugin set: " + JSON.stringify(pluginSet));
 
                     for (i = 0; i < pluginSet.length; i++) {
                         try {
@@ -293,25 +286,10 @@
     }
     
     function init() {
-        var os       = require("os"),
-            versions = require("./lib/versions");
-
-        versions.logPackageInformation("[init]", __dirname);
-        versions.logGitInformation("[init]", __dirname);
-
-        // Record command line arguments
-        console.log("[init] Node.js version: %j", process.versions);
-        console.log("[init] OS: %s %s (%s), platform: %s", os.type(), os.release(), os.arch(), process.platform);
-        console.log("[init] unparsed command line: %j", process.argv);
-        console.log("[init] parsed command line: %j", argv);
-                              
         // Start async process to initialize generator
-        setupGenerator().done(
-            function () {
-                console.log("Generator initialized");
-            },
+        setupGenerator().fail(
             function (err) {
-                stop(-3, "generator failed to initialize: " + err);
+                stop(-3, "Generator failed to initialize: " + err);
             }
         );
     }
@@ -325,7 +303,7 @@
             }
         }
 
-        stop(-1, "uncaught exception" + (err ? (": " + err.message) : "undefined"));
+        stop(-1, "Uncaught exception" + (err ? (": " + err.message) : "undefined"));
     });
 
     init();
