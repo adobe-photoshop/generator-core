@@ -219,7 +219,7 @@
             options.password = null; // No encryption over pipes
         } else if (typeof argv.port === "number" && argv.host && argv.password) {
             options.port = argv.port;
-            options.host = argv.host;
+            options.hostname = argv.host;
             options.password = argv.password;
         }
         
