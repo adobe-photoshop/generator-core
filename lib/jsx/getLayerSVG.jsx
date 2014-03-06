@@ -52,12 +52,10 @@ svg.reset = function ()
     this.savedGradients = [];
     this.gradientDict = {};
     // Yes, you really need all this gobbledygook
-    this.svgHeader = ['<?xml version="1.0" encoding="utf-8"?>',
-                      '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">',
-                      '<svg version="1.1" baseProfile="full"',
+    this.svgHeader = ['<svg ',
+					' version="1.1" baseProfile="full"',
                       ' xmlns="http://www.w3.org/2000/svg"',
-                      ' xmlns:xlink="http://www.w3.org/1999/xlink"',
-                      ' xmlns:ev="http://www.w3.org/2001/xml-events" >\n'].join('\n');
+                      ' xmlns:xlink="http://www.w3.org/1999/xlink" >\n'].join('\n');
 };
 
 // Convert special characters to &#NN; form.  Note '\r' is
