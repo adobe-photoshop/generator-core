@@ -1,4 +1,4 @@
-// Copyright 2012 Adobe Systems Incorporated.  All Rights reserved.
+// Copyright 2012-2014 Adobe Systems Incorporated.  All Rights reserved.
 
 //
 // Convert layer data into SVG output.
