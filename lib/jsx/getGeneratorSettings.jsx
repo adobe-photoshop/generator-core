@@ -19,15 +19,15 @@ var actionSendJSON = stringIDToTypeID("sendJSONToNetworkClient");
 var theRef = new ActionReference();
 theRef.putProperty(classProperty, stringIDToTypeID("generatorSettings"));
 if (params.documentId) {
-	theRef.putIdentifier(classDocument, params.documentId);
+    theRef.putIdentifier(classDocument, params.documentId);
 } else {
-	theRef.putEnumerated(classDocument, typeOrdinal, enumTarget);
+    theRef.putEnumerated(classDocument, typeOrdinal, enumTarget);
 }
 
 var getDescriptor = new ActionDescriptor();
 getDescriptor.putReference(propNull, theRef);
 if (params.key) {
-	getDescriptor.putString(propProperty, params.key);
+    getDescriptor.putString(propProperty, params.key);
 }
 
 var desc = executeAction(actionGet, getDescriptor, DialogModes.NO);
