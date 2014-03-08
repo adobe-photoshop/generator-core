@@ -55,7 +55,8 @@ svg.reset = function ()
     this.svgHeader = ['<svg ',
                       ' version="1.1" baseProfile="full"',
                       ' xmlns="http://www.w3.org/2000/svg"',
-                      ' xmlns:xlink="http://www.w3.org/1999/xlink" >\n'].join('\n');
+                      ' xmlns:xlink="http://www.w3.org/1999/xlink"',
+                      ' width="$width$" height="$height$">\n'].join('\n');
 };
 
 // Convert special characters to &#NN; form.  Note '\r' is
@@ -266,13 +267,18 @@ svg.addGradientOverlay = function ()
 };
 
 // Substitute filter parameters (delimited with $dollar$) using the params dictionary
-svg.replaceFilterKeys = function (filterStr, params)
+svg.replaceKeywords = function (filterStr, params)
 {
     var i, replaceList = filterStr.match(/[$](\w+)[$]/g);
     for (i = 0; i < replaceList.length; ++i) {
         filterStr = filterStr.replace(replaceList[i], params[replaceList[i].split('$')[1]]);
     }
-    this.addDef(filterStr);
+    return filterStr;
+};
+
+svg.replaceFilterKeys = function (filterStr, params)
+{
+    this.addDef(this.replaceKeywords(filterStr, params));
     this.pushFXGroup('filter',  'url(#' + params.filterTag + ')');
 };
 
@@ -1028,14 +1034,22 @@ svg.popUnits = function ()
 };
 
 // This assumes "params" are pre-defined globals
-svg.createSVGDesc = function ()
+svg.createSVGText = function ()
 {
     svg.reset();
     svg.pushUnits();
-    svg.processLayer(PSLayerInfo.layerIDToIndex(params.layerID));
+    
+    var curLayer = PSLayerInfo.layerIDToIndex(params.layerID);
+    this.setCurrentLayer(curLayer);
+    var bounds = this.currentLayer.getBounds();
+
+    var boundsParams = {width: (bounds[2] - bounds[0]).asCSS(),
+                        height: (bounds[3] - bounds[1]).asCSS()};
+
+    svg.processLayer(curLayer);
     svg.popUnits();
     
-    var svgResult = this.svgHeader;
+    var svgResult = this.replaceKeywords(this.svgHeader, boundsParams);
     if (svg.svgDefs.length > 0) {
         svgResult += "<defs>\n" + svg.svgDefs + "\n</defs>";
     }
@@ -1047,6 +1061,12 @@ svg.createSVGDesc = function ()
         svgResult += '</g>';
     }
     svgResult += "</svg>";
+    return svgResult;
+};
+
+svg.createSVGDesc = function ()
+{
+    var svgResult = this.createSVGText();
     var svgDesc = new ActionDescriptor();
     svgDesc.putString(app.stringIDToTypeID("svgText"), encodeURI(svgResult));
     return svgDesc;
