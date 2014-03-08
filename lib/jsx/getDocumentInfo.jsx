@@ -2,13 +2,13 @@
 // Required params:
 //   - flags: An object with flags as keys and boolean values
 //     Sample: {
-//         compInfo:           true,
-//         imageInfo:          true,
-//         layerInfo:          true,
-//         expandSmartObjects: false,
-//         getTextStyles:      true,
-//         selectedLayers:     true,
-//         getCompSettings:    true
+//         compInfo:             true,
+//         imageInfo:            true,
+//         layerInfo:            true,
+//         expandSmartObjects:   false,
+//         getTextStyles:        true,
+//         selectedLayers:       true,  // Whether to only return information about the selected layers
+//         getCompLayerSettings: true   // Whether to return layer comp settings for each layer
 //     }
 // Optional params:
 //   - documentId: The ID of the document requested (leave null for current document)
