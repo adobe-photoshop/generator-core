@@ -1,4 +1,4 @@
-// Copyright 2012 Adobe Systems Incorporated.  All Rights reserved.
+// Copyright 2012-2014 Adobe Systems Incorporated.  All Rights reserved.
 
 //
 // Convert layer data into SVG output.
@@ -44,7 +44,7 @@ svg.reset = function ()
     this.svgDefs = "";
     this.gradientID = 0;
     this.filterID = 0;
-    this.groupLevel = 0;
+    this.fxGroupCount = [0];
     this.savedColorMode = null;
     this.currentLayer = null;
     this.saveUnits = null;
@@ -52,12 +52,10 @@ svg.reset = function ()
     this.savedGradients = [];
     this.gradientDict = {};
     // Yes, you really need all this gobbledygook
-    this.svgHeader = ['<?xml version="1.0" encoding="utf-8"?>',
-                      '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">',
-                      '<svg version="1.1" baseProfile="full"',
+    this.svgHeader = ['<svg ',
+                      ' version="1.1" baseProfile="full"',
                       ' xmlns="http://www.w3.org/2000/svg"',
-                      ' xmlns:xlink="http://www.w3.org/1999/xlink"',
-                      ' xmlns:ev="http://www.w3.org/2001/xml-events" >\n'].join('\n');
+                      ' xmlns:xlink="http://www.w3.org/1999/xlink" >\n'].join('\n');
 };
 
 // Convert special characters to &#NN; form.  Note '\r' is
@@ -78,24 +76,24 @@ svg.HTMLEncode = function (str)
 // Modes: "RGBColorMode", "CMYKColorMode", "labColorMode"
 svg.changeColorMode = function (dstMode)
 {
-	var sid = stringIDToTypeID;
-	// Add the "Mode" suffix if it's missing
-	if (! dstMode.match(/Mode$/)) {
-		dstMode += "Mode";
+    var sid = stringIDToTypeID;
+    // Add the "Mode" suffix if it's missing
+    if (! dstMode.match(/Mode$/)) {
+        dstMode += "Mode";
     }
-	var desc = new ActionDescriptor();
-	desc.putClass(sid("to"), sid(dstMode));
-	desc.putBoolean(sid("merge"), false);
-	desc.putBoolean(sid("rasterize"), false);
-	executeAction(sid("convertMode"), desc, DialogModes.NO);
+    var desc = new ActionDescriptor();
+    desc.putClass(sid("to"), sid(dstMode));
+    desc.putBoolean(sid("merge"), false);
+    desc.putBoolean(sid("rasterize"), false);
+    executeAction(sid("convertMode"), desc, DialogModes.NO);
 };
 
 svg.documentColorMode = function ()
 {
-	// Reports "colorSpace:CMYKColorEnum", "colorSpace:RGBColor", "colorSpace:labColor"
-	var s = cssToClip.getDocAttr("mode");
-	s = s.replace(/^colorSpace:/, "").replace(/Enum$/, "");	// Strip off excess
-	return s;
+    // Reports "colorSpace:CMYKColorEnum", "colorSpace:RGBColor", "colorSpace:labColor"
+    var s = cssToClip.getDocAttr("mode");
+    s = s.replace(/^colorSpace:/, "").replace(/Enum$/, ""); // Strip off excess
+    return s;
 };
 
 // Call internal PS code to write the current layer's pixels and convert it to PNG.
@@ -148,27 +146,6 @@ svg.addText = function (s)
 svg.addParam = function (paramName, value)
 {
     this.addText(" " + paramName + '="' + value + '"');
-};
-
-svg.pushFXGroup = function (groupParam, groupValue)
-{
-    this.addText("<g");
-    this.addParam(groupParam, groupValue);
-    this.addText(">\n");
-    this.groupLevel++;
-};
-
-svg.popFXGroups = function ()
-{
-    var i;
-    if (this.groupLevel > 0)
-    {
-        for (i = 0; i < this.groupLevel; ++i) {
-            this.addText("</g>");
-        }
-        this.addText("\n");
-        this.groupLevel = 0;
-    }
 };
 
 // Definitions (such as linear gradients) must be collected and output ahead
@@ -299,9 +276,31 @@ svg.replaceFilterKeys = function (filterStr, params)
     this.pushFXGroup('filter',  'url(#' + params.filterTag + ')');
 };
 
+// Note each effect added for a particular layer requires a separate SVG group.
+svg.pushFXGroup = function (groupParam, groupValue)
+{
+    this.addText("<g");
+    this.addParam(groupParam, groupValue);
+    this.addText(">\n");
+    this.fxGroupCount[0]++;
+};
+
+svg.popFXGroups = function ()
+{
+    var i;
+    if (this.fxGroupCount[0] > 0)
+    {
+        for (i = 0; i < this.fxGroupCount[0]; ++i) {
+            this.addText("</g>");
+        }
+        this.addText("\n");
+        this.fxGroupCount[0] = 0;
+    }
+};
+
 svg.psModeToSVGmode = function (psMode)
 {
-	psMode = psMode.replace(/^blendMode[:]\s*/, ""); // Remove enum class
+    psMode = psMode.replace(/^blendMode[:]\s*/, ""); // Remove enum class
     var modeMap = { 'colorBurn': null, 'linearBurn': 'multiply', 'darkenColor': null, 'multiply': 'multiply',
                     'lighten': 'lighten', 'screen': 'screen', 'colorDodge': null, 'linearDodge': 'lighten',
                     'lighterColor': 'normal', 'normal': 'normal', 'overlay': null, 'softLight': null,
@@ -428,9 +427,12 @@ svg.addLayerFX = function ()
 {
     // Gradient overlay layerFX are handled by just generating another copy of the shape
     // with the desired gradient fill, rather than using an SVG filter
+    var saveCount = this.fxGroupCount[0];
     this.addDropShadow();
     this.addInnerShadow();
     this.addColorOverlay();
+    // Return true if an effect was actually generated.
+    return saveCount !== this.fxGroupCount[0];
 };
 
 svg.addOpacity = function (combine)
@@ -588,6 +590,7 @@ svg.getShapeLayerSVG = function ()
 
     this.addText('\n d="' + this.getLayerAttr("layerVectorPointData") + '"');
     this.addText('/>\n');
+
     this.popFXGroups();
     
     if (gradOverlayID)
@@ -826,6 +829,7 @@ svg.getTextLayerSVG1 = function (fillColor)
             this.addText(textStr);
         }
         this.addText('</text>\n');
+
         this.popFXGroups();
     }
 };
@@ -899,6 +903,7 @@ svg.getGroupLayerSVG = function (processAllLayers)
     var layerLevel = processAllLayers ? 2 : 1;
     var visibleLevel = layerLevel;
     var i, curIndex = this.currentLayer.index;
+    var saveGroup = [];
     if (this.currentLayer.layerKind === kLayerGroupSheet)
     {
         if (! this.currentLayer.visible) {
@@ -917,6 +922,10 @@ svg.getGroupLayerSVG = function (processAllLayers)
             {
                 if (nextLayer.visible && (visibleLevel === layerLevel)) {
                     visibleLevel++;
+                    // The layers and section bounds must be swapped
+                    // in order to process the group's layerFX 
+                    saveGroup.push(nextLayer);
+                    groupLayers.push(kHiddenSectionBounder);
                 }
                 layerLevel++;
             }
@@ -933,14 +942,43 @@ svg.getGroupLayerSVG = function (processAllLayers)
             layerLevel--;
             if (layerLevel < visibleLevel) {
                 visibleLevel = layerLevel;
+                if (saveGroup.length > 0) {
+                    groupLayers.push(saveGroup.pop());
+                }
             }
         }
         curIndex--;
     }
 
+    // Each layerFX (e.g., an inner shadow & outer shadow) needs it's own SVG
+    // group.  So a group's set of layerFX must be counted separately from any
+    // layerFX that may be present within the group.  The fxGroupCount stack
+    // manages the count of individual layerFX for each group.
+    this.addLayerFX();
+    this.fxGroupCount.unshift(0);
+
     for (i = groupLayers.length - 1; i >= 0; --i) {
-        this.processLayer(groupLayers[i]);
+        if (groupLayers[i] === kHiddenSectionBounder)
+        {
+            this.fxGroupCount.shift();
+            this.popFXGroups();
+        }
+        else
+        {
+            if (groupLayers[i].layerKind === kLayerGroupSheet)
+            {
+                this.setCurrentLayer(groupLayers[i]);
+                this.addLayerFX();
+                this.fxGroupCount.unshift(0);
+            }
+            else {
+                this.processLayer(groupLayers[i]);
+            }
+        }
     }
+
+    this.fxGroupCount.shift();
+    this.popFXGroups();
 };
 
 svg.processLayer = function (layer)
@@ -967,13 +1005,13 @@ svg.pushUnits = function ()
     this.saveUnits = app.preferences.rulerUnits;
     app.preferences.rulerUnits = Units.PIXELS;  // Web dudes want pixels.
     this.startTime = new Date();
-	var mode = this.documentColorMode();
-	this.savedColorMode = null;
-	// Support labColor & CMYK as well
-	if ((mode !== "RGBColor") && (mode in {"labColor": 1, "CMYKColor": 1})) {
-		this.savedColorMode = mode;
-		this.changeColorMode("RGBColor");
-	}
+    var mode = this.documentColorMode();
+    this.savedColorMode = null;
+    // Support labColor & CMYK as well
+    if ((mode !== "RGBColor") && (mode in {"labColor": 1, "CMYKColor": 1})) {
+        this.savedColorMode = mode;
+        this.changeColorMode("RGBColor");
+    }
 };
 
 svg.popUnits = function ()
@@ -981,8 +1019,8 @@ svg.popUnits = function ()
     if (this.saveUnits) {
         app.preferences.rulerUnits = this.saveUnits;
     }
-	if (this.savedColorMode) {
-		this.changeColorMode(this.savedColorMode);
+    if (this.savedColorMode) {
+        this.changeColorMode(this.savedColorMode);
     }
 
     var elapsedTime = new Date() - this.startTime;
