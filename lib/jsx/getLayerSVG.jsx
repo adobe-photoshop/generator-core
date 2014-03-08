@@ -53,7 +53,7 @@ svg.reset = function ()
     this.gradientDict = {};
     // Yes, you really need all this gobbledygook
     this.svgHeader = ['<svg ',
-					' version="1.1" baseProfile="full"',
+                      ' version="1.1" baseProfile="full"',
                       ' xmlns="http://www.w3.org/2000/svg"',
                       ' xmlns:xlink="http://www.w3.org/1999/xlink" >\n'].join('\n');
 };
@@ -76,24 +76,24 @@ svg.HTMLEncode = function (str)
 // Modes: "RGBColorMode", "CMYKColorMode", "labColorMode"
 svg.changeColorMode = function (dstMode)
 {
-	var sid = stringIDToTypeID;
-	// Add the "Mode" suffix if it's missing
-	if (! dstMode.match(/Mode$/)) {
-		dstMode += "Mode";
+    var sid = stringIDToTypeID;
+    // Add the "Mode" suffix if it's missing
+    if (! dstMode.match(/Mode$/)) {
+        dstMode += "Mode";
     }
-	var desc = new ActionDescriptor();
-	desc.putClass(sid("to"), sid(dstMode));
-	desc.putBoolean(sid("merge"), false);
-	desc.putBoolean(sid("rasterize"), false);
-	executeAction(sid("convertMode"), desc, DialogModes.NO);
+    var desc = new ActionDescriptor();
+    desc.putClass(sid("to"), sid(dstMode));
+    desc.putBoolean(sid("merge"), false);
+    desc.putBoolean(sid("rasterize"), false);
+    executeAction(sid("convertMode"), desc, DialogModes.NO);
 };
 
 svg.documentColorMode = function ()
 {
-	// Reports "colorSpace:CMYKColorEnum", "colorSpace:RGBColor", "colorSpace:labColor"
-	var s = cssToClip.getDocAttr("mode");
-	s = s.replace(/^colorSpace:/, "").replace(/Enum$/, "");	// Strip off excess
-	return s;
+    // Reports "colorSpace:CMYKColorEnum", "colorSpace:RGBColor", "colorSpace:labColor"
+    var s = cssToClip.getDocAttr("mode");
+    s = s.replace(/^colorSpace:/, "").replace(/Enum$/, ""); // Strip off excess
+    return s;
 };
 
 // Call internal PS code to write the current layer's pixels and convert it to PNG.
@@ -300,7 +300,7 @@ svg.popFXGroups = function ()
 
 svg.psModeToSVGmode = function (psMode)
 {
-	psMode = psMode.replace(/^blendMode[:]\s*/, ""); // Remove enum class
+    psMode = psMode.replace(/^blendMode[:]\s*/, ""); // Remove enum class
     var modeMap = { 'colorBurn': null, 'linearBurn': 'multiply', 'darkenColor': null, 'multiply': 'multiply',
                     'lighten': 'lighten', 'screen': 'screen', 'colorDodge': null, 'linearDodge': 'lighten',
                     'lighterColor': 'normal', 'normal': 'normal', 'overlay': null, 'softLight': null,
@@ -590,7 +590,7 @@ svg.getShapeLayerSVG = function ()
 
     this.addText('\n d="' + this.getLayerAttr("layerVectorPointData") + '"');
     this.addText('/>\n');
-	
+
     this.popFXGroups();
     
     if (gradOverlayID)
@@ -639,7 +639,7 @@ svg.getAdjustmentLayerSVG = function ()
     }
     this.addText("/>\n");
 
-	this.popFXGroups();
+    this.popFXGroups();
     
     if (gradOverlayID)
     {
@@ -829,7 +829,7 @@ svg.getTextLayerSVG1 = function (fillColor)
             this.addText(textStr);
         }
         this.addText('</text>\n');
-		
+
         this.popFXGroups();
     }
 };
