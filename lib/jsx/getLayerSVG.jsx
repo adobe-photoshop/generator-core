@@ -965,7 +965,6 @@ svg.getGroupLayerSVG = function (processAllLayers)
         }
         else
         {
-            $.writeln("Processing ID: " + groupLayers[i].layerID);
             if (groupLayers[i].layerKind === kLayerGroupSheet)
             {
                 this.setCurrentLayer(groupLayers[i]);
