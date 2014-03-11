@@ -8,7 +8,7 @@
 
 /* jshint bitwise: false, strict: false, quotmark: false, forin: false,
    multistr: true, laxbreak: true, maxlen: 255, esnext: true */
-/* global $, app, File, ActionDescriptor, executeAction, PSLayerInfo,
+/* global $, app, File, ActionDescriptor, executeAction, PSLayerInfo, UnitValue,
    DialogModes, cssToClip, stripUnits, round1k, GradientStop, stringIDToTypeID,
    Folder, kAdjustmentSheet, kLayerGroupSheet, kHiddenSectionBounder, kVectorSheet,
    kTextSheet, kPixelSheet, kSmartObjectSheet, Units, params, runGetLayerSVGfromScript */
@@ -49,6 +49,7 @@ svg.reset = function ()
     this.currentLayer = null;
     this.saveUnits = null;
     this.startTime = 0;
+    this.maxStrokeWidth = 0;
     this.savedGradients = [];
     this.gradientDict = {};
     // Yes, you really need all this gobbledygook
@@ -513,6 +514,7 @@ svg.getVal2 = function (attrName, descList)
 // Process shape layers
 svg.getShapeLayerSVG = function ()
 {
+    var self = this;
     var agmDesc = this.currentLayer.getLayerAttr("AGMStrokeStyleInfo");
     var capDict = {"strokeStyleRoundCap": 'round', "strokeStyleButtCap": 'butt',
                    "strokeStyleSquareCap": 'square'};
@@ -528,10 +530,11 @@ svg.getShapeLayerSVG = function ()
         {
             svg.addAttribute(' stroke="$strokeStyleContent.color$"', agmDesc);
             svg.addAttribute(' stroke-width="$strokeStyleLineWidth$"', agmDesc);
+            var strokeWidth = stripUnits(agmDesc.getVal("strokeStyleLineWidth"));
+            self.maxStrokeWidth = Math.max(strokeWidth, self.maxStrokeWidth);
             var dashes = agmDesc.getVal("strokeStyleLineDashSet", false);
             if (dashes && dashes.length)
             {
-                var strokeWidth = stripUnits(agmDesc.getVal("strokeStyleLineWidth"));
                 // Patch the "[0,2]" dash pattern from the default dotted style, else the stroke
                 // vanishes completely.  Need to investigate further someday.
                 if ((dashes.length === 2) && (dashes[0] === 0) && (dashes[1] === 2)) {
@@ -1041,12 +1044,15 @@ svg.createSVGText = function ()
     
     var curLayer = PSLayerInfo.layerIDToIndex(params.layerID);
     this.setCurrentLayer(curLayer);
-    var bounds = this.currentLayer.getBounds();
-
-    var boundsParams = {width: (bounds[2] - bounds[0]).asCSS(),
-                        height: (bounds[3] - bounds[1]).asCSS()};
-
     svg.processLayer(curLayer);
+
+    // PS ignores the stroke when finding the bounds (bug?), so we add in
+    // a fudge factor based on the largest stroke width found.
+    var bounds = this.currentLayer.getBounds();
+    var halfStrokeWidth = new UnitValue(this.maxStrokeWidth / 2, 'px');
+    var boundsParams = {width: (bounds[2] + halfStrokeWidth).asCSS(),
+                        height: (bounds[3] + halfStrokeWidth).asCSS()};
+
     svg.popUnits();
     
     var svgResult = this.replaceKeywords(this.svgHeader, boundsParams);
