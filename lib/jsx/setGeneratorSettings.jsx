@@ -38,6 +38,6 @@ var setDescriptor = new ActionDescriptor();
 setDescriptor.putReference(propNull, theRef);
 setDescriptor.putObject(keyTo, classNull, generatorSettingsDesc);
 if (params.key) {
-	setDescriptor.putString(propProperty, params.key);
+    setDescriptor.putString(propProperty, params.key);
 }
 executeAction(actionSet, setDescriptor, DialogModes.NO);
