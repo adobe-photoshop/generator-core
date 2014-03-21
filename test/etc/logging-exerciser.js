@@ -31,9 +31,10 @@
 
     var logging = require("../../lib/logging");
 
-    var logger = new logging.Logger();
+    var loggerManager = new logging.LoggerManager(),
+        logger = loggerManager.createLogger("exerciser");
 
-    var formatter = new logging.StreamLogFormatter(logger);
+    var formatter = new logging.StreamFormatter(loggerManager);
     formatter.on("end", function () { console.log("it's over!"); });
     formatter.pipe(process.stdout);
 
@@ -52,12 +53,12 @@
 
     setTimeout(function () {
         logger.log("log from timer, calling logger.end");
-        logger.end();
+        loggerManager.end();
         logger.log("this shouldn't log");
     }, 1000);
 
     logger.error("\n\nsetting level to LOG_LEVEL_DEBUG");
-    logger.level = logging.LOG_LEVEL_DEBUG;
+    loggerManager.level = logging.LOG_LEVEL_DEBUG;
     logger.debug("debug");
     logger.info("info");
     logger.warn("warn");
@@ -66,7 +67,7 @@
     logger.log("log/info");
 
     logger.error("\n\nsetting level to LOG_LEVEL_INFO");
-    logger.level = logging.LOG_LEVEL_INFO;
+    loggerManager.level = logging.LOG_LEVEL_INFO;
     logger.debug("debug");
     logger.info("info");
     logger.warn("warn");
@@ -75,7 +76,7 @@
     logger.log("log/info");
 
     logger.error("\n\nsetting level to LOG_LEVEL_WARNING");
-    logger.level = logging.LOG_LEVEL_WARNING;
+    loggerManager.level = logging.LOG_LEVEL_WARNING;
     logger.debug("debug");
     logger.info("info");
     logger.warn("warn");
@@ -84,7 +85,7 @@
     logger.log("log/info");
 
     logger.error("\n\nsetting level to LOG_LEVEL_ERROR");
-    logger.level = logging.LOG_LEVEL_ERROR;
+    loggerManager.level = logging.LOG_LEVEL_ERROR;
     logger.debug("debug");
     logger.info("info");
     logger.warn("warn");
@@ -93,7 +94,7 @@
     logger.log("log/info");
 
     logger.error("\n\nsetting level to LOG_LEVEL_NONE");
-    logger.level = logging.LOG_LEVEL_NONE;
+    loggerManager.level = logging.LOG_LEVEL_NONE;
     logger.debug("debug");
     logger.info("info");
     logger.warn("warn");
@@ -102,7 +103,6 @@
     logger.log("log/info");
 
     logger.error("\n\nsetting level to LOG_LEVEL_DEBUG (this won't be printed)");
-    logger.level = logging.LOG_LEVEL_DEBUG;
-
+    loggerManager.level = logging.LOG_LEVEL_DEBUG;
 
 }());
