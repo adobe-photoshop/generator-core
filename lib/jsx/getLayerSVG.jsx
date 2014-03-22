@@ -8,22 +8,39 @@
 
 /* jshint bitwise: false, strict: false, quotmark: false, forin: false,
    multistr: true, laxbreak: true, maxlen: 255, esnext: true */
-/* global $, app, File, ActionDescriptor, executeAction, PSLayerInfo, UnitValue,
-   DialogModes, cssToClip, stripUnits, round1k, GradientStop, stringIDToTypeID,
+/* global $, app, File, ActionDescriptor, ActionReference, executeAction, PSLayerInfo,
+   UnitValue, DialogModes, cssToClip, stripUnits, round1k, GradientStop, stringIDToTypeID,
    Folder, kAdjustmentSheet, kLayerGroupSheet, kHiddenSectionBounder, kVectorSheet,
-   kTextSheet, kPixelSheet, kSmartObjectSheet, Units, params, runGetLayerSVGfromScript */
+   kTextSheet, kPixelSheet, kSmartObjectSheet, Units, params, runGetLayerSVGfromScript,
+   typeOrdinal, typeNULL, eventSelect, charIDToTypeID */
 /* exported runCopyCSSFromScript */
+
+// The built-in "app.path" is broken on the Mac, so we roll our own.
+function getPSAppPath()
+{
+    const kexecutablePathStr = stringIDToTypeID("executablePath");
+
+    var desc = new ActionDescriptor();
+    var ref = new ActionReference();
+    ref.putProperty(charIDToTypeID('Prpr'), kexecutablePathStr);
+    ref.putEnumerated(charIDToTypeID('capp'), charIDToTypeID('Ordn'),
+                      charIDToTypeID('Trgt'));
+    desc.putReference(charIDToTypeID('null'), ref);
+    var result = executeAction(charIDToTypeID('getd'), desc, DialogModes.NO);
+    return File.decode(result.getPath(kexecutablePathStr));
+}
 
 // This uses many routines from CopyCSS, so load the script but tell it not to execute first.
 if (typeof cssToClip === "undefined")
 {
     var runCopyCSSFromScript = true;
-    var appFolder = { Windows: "/", Macintosh: "/Adobe Photoshop CC.app/Contents/" };
-    $.evalFile(app.path + appFolder[File.fs] + "Required/CopyCSSToClipboard.jsx");
+    var appFolder = { Windows: "/", Macintosh: "/../" };
+    $.evalFile(getPSAppPath() + appFolder[File.fs] + "Required/CopyCSSToClipboard.jsx");
 }
 
 const ksendLayerThumbnailToNetworkClientStr = app.stringIDToTypeID("sendLayerThumbnailToNetworkClient");
 const krawPixmapFilePathStr = app.stringIDToTypeID("rawPixmapFilePath");
+
 const kformatStr = app.stringIDToTypeID("format");
 // const kselectedLayerStr = app.stringIDToTypeID("selectedLayer");
 const kwidthStr = app.stringIDToTypeID("width");
@@ -57,7 +74,8 @@ svg.reset = function ()
                       ' version="1.1" baseProfile="full"',
                       ' xmlns="http://www.w3.org/2000/svg"',
                       ' xmlns:xlink="http://www.w3.org/1999/xlink"',
-                      ' width="$width$" height="$height$">\n'].join('\n');
+                      ' width="$width$" height="$height$"',
+                      '>\n'].join('\n');
 };
 
 // Convert special characters to &#NN; form.  Note '\r' is
@@ -112,6 +130,42 @@ svg.writeLayerPNGfile = function (path)
     desc.putInteger(kheightStr, 10000);
     desc.putInteger(kformatStr, 2); // Want raw pixels, not unsupported JPEG
     executeAction(ksendLayerThumbnailToNetworkClientStr, desc, DialogModes.NO);
+};
+
+// Make the last edit to the document vanish from this history state.
+// This is so we can silently move the layer to the origin and back.
+svg.killLastHistoryState = function ()
+{
+    const classHistoryState       = app.charIDToTypeID('HstS');
+    const enumLast                = app.charIDToTypeID('Lst ');
+    const eventDelete             = app.charIDToTypeID('Dlt ');
+    const keyCurrentHistoryState  = app.charIDToTypeID('CrnH');
+
+    // Select the last history state
+    var selDesc = new ActionDescriptor();
+    var selRef = new ActionReference();
+    selRef.putEnumerated(classHistoryState, typeOrdinal, enumLast);
+    selDesc.putReference(typeNULL, selRef);
+    executeAction(eventSelect, selDesc, DialogModes.NO);
+
+    // Nuke it
+    var delDesc = new ActionDescriptor();
+    var delRef = new ActionReference();
+    delRef.putProperty(classHistoryState, keyCurrentHistoryState);
+    delDesc.putReference(typeNULL, delRef);
+    executeAction(eventDelete, delDesc, DialogModes.NO);
+};
+
+// Setting this to "false" tunes out Generator, so changes made in the script
+// are not tracked by Generator.
+svg.enableGeneratorTrack = function (flag)
+{
+    const kgeneratorEnableTrack = app.stringIDToTypeID("generatorTrackingEnable");
+    const keyEnabled = app.charIDToTypeID('enab');
+
+    var desc = new ActionDescriptor();
+    desc.putBoolean(keyEnabled, flag);
+    executeAction(kgeneratorEnableTrack, desc, DialogModes.NO);
 };
 
 svg.reset();
@@ -271,8 +325,10 @@ svg.addGradientOverlay = function ()
 svg.replaceKeywords = function (filterStr, params)
 {
     var i, replaceList = filterStr.match(/[$](\w+)[$]/g);
-    for (i = 0; i < replaceList.length; ++i) {
-        filterStr = filterStr.replace(replaceList[i], params[replaceList[i].split('$')[1]]);
+    if (replaceList) {
+        for (i = 0; i < replaceList.length; ++i) {
+            filterStr = filterStr.replace(replaceList[i], params[replaceList[i].split('$')[1]]);
+        }
     }
     return filterStr;
 };
@@ -757,7 +813,9 @@ svg.getTextLayerSVG1 = function (fillColor)
         
         if (! transformMatrixUsed)
         {
-            textBottom = stripUnits(boundsDesc.getVal("bottom"));
+            textBottom = stripUnits(boundsDesc.getVal("top"));
+            var baselineDelta = stripUnits(this.getLayerAttr("textKey.boundingBox.top"));
+            textBottom += -baselineDelta;
             leftMargin = boundsDesc.getVal('left'); // For multi-line text
         }
 
@@ -1044,17 +1102,37 @@ svg.createSVGText = function ()
     
     var curLayer = PSLayerInfo.layerIDToIndex(params.layerID);
     this.setCurrentLayer(curLayer);
+
+    var bounds, wasClean = app.activeDocument.saved;
+
+    this.enableGeneratorTrack(false);
+
+    // We have to resort to the DOM here, because:
+    // - Getting the bounds via events fails for groups, and
+    // - Only the active (target) layer can be translated
+    var savedLayer = app.activeDocument.activeLayer;
+    this.currentLayer.makeLayerActive();
+    bounds = app.activeDocument.activeLayer.bounds;
+    app.activeDocument.activeLayer.translate(-bounds[0], -bounds[1]);
+    app.activeDocument.activeLayer = savedLayer;
+    
     svg.processLayer(curLayer);
 
     // PS ignores the stroke when finding the bounds (bug?), so we add in
     // a fudge factor based on the largest stroke width found.
-    var bounds = this.currentLayer.getBounds();
     var halfStrokeWidth = new UnitValue(this.maxStrokeWidth / 2, 'px');
-    var boundsParams = {width: (bounds[2] + halfStrokeWidth).asCSS(),
-                        height: (bounds[3] + halfStrokeWidth).asCSS()};
+    var boundsParams = {width: (bounds[2] - bounds[0] + halfStrokeWidth).asCSS(),
+                        height: (bounds[3] - bounds[1] + halfStrokeWidth).asCSS()};
 
     svg.popUnits();
     
+    this.killLastHistoryState();    // Pretend translate never happened
+    if (wasClean) {                 // If saveState was clean, pretend we never touched it
+        executeAction(app.stringIDToTypeID("resetDocumentChanged"),
+                              new ActionDescriptor(), DialogModes.NO);
+    }
+    this.enableGeneratorTrack(true);
+       
     var svgResult = this.replaceKeywords(this.svgHeader, boundsParams);
     if (svg.svgDefs.length > 0) {
         svgResult += "<defs>\n" + svg.svgDefs + "\n</defs>";
