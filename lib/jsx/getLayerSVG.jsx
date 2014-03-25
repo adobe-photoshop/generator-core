@@ -74,7 +74,6 @@ svg.reset = function ()
                       ' version="1.1" baseProfile="full"',
                       ' xmlns="http://www.w3.org/2000/svg"',
                       ' xmlns:xlink="http://www.w3.org/1999/xlink"',
-                      ' width="$width$" height="$height$"',
                       '>\n'].join('\n');
 };
 
@@ -588,6 +587,7 @@ svg.getShapeLayerSVG = function ()
             svg.addAttribute(' stroke-width="$strokeStyleLineWidth$"', agmDesc);
             var strokeWidth = stripUnits(agmDesc.getVal("strokeStyleLineWidth"));
             self.maxStrokeWidth = Math.max(strokeWidth, self.maxStrokeWidth);
+
             var dashes = agmDesc.getVal("strokeStyleLineDashSet", false);
             if (dashes && dashes.length)
             {
@@ -1099,41 +1099,50 @@ svg.createSVGText = function ()
 {
     svg.reset();
     svg.pushUnits();
+    // Fixing the SVG bounds requires being able to stop Generator's tracking,
+    // which is only available in PS v15 (CC 2014) and up.
+    var fixBoundsAvailable = Number(app.version.match(/\d+/)) >= 15;
     
-    var curLayer = PSLayerInfo.layerIDToIndex(params.layerID);
+    var savedLayer, curLayer = PSLayerInfo.layerIDToIndex(params.layerID);
     this.setCurrentLayer(curLayer);
 
     var bounds, wasClean = app.activeDocument.saved;
+ 
+    if (fixBoundsAvailable) {
+        this.enableGeneratorTrack(false);
 
-    this.enableGeneratorTrack(false);
-
-    // We have to resort to the DOM here, because:
-    // - Getting the bounds via events fails for groups, and
-    // - Only the active (target) layer can be translated
-    var savedLayer = app.activeDocument.activeLayer;
-    this.currentLayer.makeLayerActive();
-    bounds = app.activeDocument.activeLayer.bounds;
-    app.activeDocument.activeLayer.translate(-bounds[0], -bounds[1]);
-    app.activeDocument.activeLayer = savedLayer;
+        // We have to resort to the DOM here, because:
+        // - Getting the bounds via events fails for groups, and
+        // - Only the active (target) layer can be translated
+        savedLayer = app.activeDocument.activeLayer;
+        this.currentLayer.makeLayerActive();
+        bounds = app.activeDocument.activeLayer.bounds;
+        app.activeDocument.activeLayer.translate(-bounds[0], -bounds[1]);
+    }
     
     svg.processLayer(curLayer);
-
-    // PS ignores the stroke when finding the bounds (bug?), so we add in
-    // a fudge factor based on the largest stroke width found.
-    var halfStrokeWidth = new UnitValue(this.maxStrokeWidth / 2, 'px');
-    var boundsParams = {width: (bounds[2] - bounds[0] + halfStrokeWidth).asCSS(),
-                        height: (bounds[3] - bounds[1] + halfStrokeWidth).asCSS()};
-
     svg.popUnits();
-    
-    this.killLastHistoryState();    // Pretend translate never happened
-    if (wasClean) {                 // If saveState was clean, pretend we never touched it
-        executeAction(app.stringIDToTypeID("resetDocumentChanged"),
-                              new ActionDescriptor(), DialogModes.NO);
+    var svgResult = this.svgHeader;
+
+    if (fixBoundsAvailable) {
+        // PS ignores the stroke when finding the bounds (bug?), so we add in
+        // a fudge factor based on the largest stroke width found.
+        var halfStrokeWidth = new UnitValue(this.maxStrokeWidth / 2, 'px');
+        var boundsParams = {width: ((bounds[2] - bounds[0]) + halfStrokeWidth).asCSS(),
+                            height: ((bounds[3] - bounds[1]) + halfStrokeWidth).asCSS()};
+
+        var boundsStr = this.replaceKeywords(' width="$width$" height="$height$">', boundsParams);
+        svgResult = svgResult.replace(">", boundsStr);
+
+        this.killLastHistoryState();    // Pretend translate never happened
+        app.activeDocument.activeLayer = savedLayer;
+        if (wasClean) {                 // If saveState was clean, pretend we never touched it
+            executeAction(app.stringIDToTypeID("resetDocumentChanged"),
+                                  new ActionDescriptor(), DialogModes.NO);
+        }
+        this.enableGeneratorTrack(true);
     }
-    this.enableGeneratorTrack(true);
        
-    var svgResult = this.replaceKeywords(this.svgHeader, boundsParams);
     if (svg.svgDefs.length > 0) {
         svgResult += "<defs>\n" + svg.svgDefs + "\n</defs>";
     }
