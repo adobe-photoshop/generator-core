@@ -1179,7 +1179,7 @@ svg.createSVGText = function ()
     // which is only available in PS v15 (CC 2014) and up.
     var fixBoundsAvailable = Number(app.version.match(/\d+/)) >= 15;
     
-    var savedLayer, curLayer = PSLayerInfo.layerIDToIndex(params.layerID);
+    var savedLayer, curLayer = PSLayerInfo.layerIDToIndex(params.layerId);
     this.setCurrentLayer(curLayer);
 
     var bounds, wasClean = app.activeDocument.saved;
@@ -1235,9 +1235,9 @@ svg.createSVGText = function ()
 svg.createSVGDesc = function ()
 {
     var saveDocID = null;
-    if (params.documentID && (params.documentID !== app.activeDocument.id)) {
+    if (params.documentId && (params.documentId !== app.activeDocument.id)) {
         saveDocID = app.activeDocument.id;
-        setDocumentByID(params.documentID);
+        setDocumentByID(params.documentId);
     }
     var svgResult = this.createSVGText();
     var svgDesc = new ActionDescriptor();
