@@ -12,7 +12,7 @@
    UnitValue, DialogModes, cssToClip, stripUnits, round1k, GradientStop, stringIDToTypeID,
    Folder, kAdjustmentSheet, kLayerGroupSheet, kHiddenSectionBounder, kVectorSheet,
    kTextSheet, kPixelSheet, kSmartObjectSheet, Units, params, runGetLayerSVGfromScript,
-   typeOrdinal, typeNULL, eventSelect, charIDToTypeID */
+   typeOrdinal, typeNULL, eventSelect, charIDToTypeID, classDocument */
 /* exported runCopyCSSFromScript */
 
 // The built-in "app.path" is broken on the Mac, so we roll our own.
@@ -28,6 +28,16 @@ function getPSAppPath()
     desc.putReference(charIDToTypeID('null'), ref);
     var result = executeAction(charIDToTypeID('getd'), desc, DialogModes.NO);
     return File.decode(result.getPath(kexecutablePathStr));
+}
+
+// Select the document by ID
+function setDocumentByID(id)
+{
+	var desc = new ActionDescriptor();
+	var ref = new ActionReference();
+	ref.putIdentifier(classDocument, id);
+	desc.putReference(typeNULL, ref);
+	executeAction(eventSelect, desc, DialogModes.NO);
 }
 
 // This uses many routines from CopyCSS, so load the script but tell it not to execute first.
@@ -1169,7 +1179,7 @@ svg.createSVGText = function ()
     // which is only available in PS v15 (CC 2014) and up.
     var fixBoundsAvailable = Number(app.version.match(/\d+/)) >= 15;
     
-    var savedLayer, curLayer = PSLayerInfo.layerIDToIndex(params.layerID);
+    var savedLayer, curLayer = PSLayerInfo.layerIDToIndex(params.layerId);
     this.setCurrentLayer(curLayer);
 
     var bounds, wasClean = app.activeDocument.saved;
@@ -1224,9 +1234,17 @@ svg.createSVGText = function ()
 
 svg.createSVGDesc = function ()
 {
+    var saveDocID = null;
+    if (params.documentId && (params.documentId !== app.activeDocument.id)) {
+        saveDocID = app.activeDocument.id;
+        setDocumentByID(params.documentId);
+    }
     var svgResult = this.createSVGText();
     var svgDesc = new ActionDescriptor();
     svgDesc.putString(app.stringIDToTypeID("svgText"), encodeURI(svgResult));
+    if (saveDocID) {
+        setDocumentByID(saveDocID);
+    }
     return svgDesc;
 };
 
