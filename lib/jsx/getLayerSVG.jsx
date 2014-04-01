@@ -12,7 +12,7 @@
    UnitValue, DialogModes, cssToClip, stripUnits, round1k, GradientStop, stringIDToTypeID,
    Folder, kAdjustmentSheet, kLayerGroupSheet, kHiddenSectionBounder, kVectorSheet,
    kTextSheet, kPixelSheet, kSmartObjectSheet, Units, params, runGetLayerSVGfromScript,
-   typeOrdinal, typeNULL, eventSelect, charIDToTypeID */
+   typeOrdinal, typeNULL, eventSelect, charIDToTypeID, classDocument */
 /* exported runCopyCSSFromScript */
 
 // The built-in "app.path" is broken on the Mac, so we roll our own.
@@ -28,6 +28,16 @@ function getPSAppPath()
     desc.putReference(charIDToTypeID('null'), ref);
     var result = executeAction(charIDToTypeID('getd'), desc, DialogModes.NO);
     return File.decode(result.getPath(kexecutablePathStr));
+}
+
+// Select the document by ID
+function setDocumentByID(id)
+{
+	var desc = new ActionDescriptor();
+	var ref = new ActionReference();
+	ref.putIdentifier(classDocument, id);
+	desc.putReference(typeNULL, ref);
+	executeAction(eventSelect, desc, DialogModes.NO);
 }
 
 // This uses many routines from CopyCSS, so load the script but tell it not to execute first.
@@ -955,10 +965,10 @@ svg.getImageLayerSVG = function ()
     this.addText(" />\n");
 };
 
-// This walks the group and outputs all items in that group.  If the current layer
-// is not a group, then it walks to the end of the document (i.e., for dumping
+// This walks the group and outputs all visible items in that group.  If the current
+// layer is not a group, then it walks to the end of the document (i.e., for dumping
 // the whole document).
-svg.getGroupLayerSVG = function (processAllLayers)
+svg.walkLayerGroup = function (processAllLayers)
 {
     function isSVGLayerKind(kind)
     {
@@ -969,7 +979,7 @@ svg.getGroupLayerSVG = function (processAllLayers)
     // If processing all of the layers, don't stop at the end of the first group
     var layerLevel = processAllLayers ? 2 : 1;
     var visibleLevel = layerLevel;
-    var i, curIndex = this.currentLayer.index;
+    var curIndex = this.currentLayer.index;
     var saveGroup = [];
     if (this.currentLayer.layerKind === kLayerGroupSheet)
     {
@@ -1016,6 +1026,12 @@ svg.getGroupLayerSVG = function (processAllLayers)
         }
         curIndex--;
     }
+    return groupLayers;
+};
+
+svg.getGroupLayerSVG = function (processAllLayers)
+{
+    var i, groupLayers = this.walkLayerGroup(processAllLayers);
 
     // Each layerFX (e.g., an inner shadow & outer shadow) needs it's own SVG
     // group.  So a group's set of layerFX must be counted separately from any
@@ -1094,6 +1110,66 @@ svg.popUnits = function ()
     return ("time: " + (elapsedTime / 1000.0) + " sec");
 };
 
+// Find the actual bounds of all the items, including strokes
+svg.findActualBounds = function ()
+{
+    
+    var i, layers = [];
+    if (this.currentLayer.layerKind === kLayerGroupSheet) {
+        layers = this.walkLayerGroup();
+    }
+    else {
+        layers.push(this.currentLayer);
+    }
+
+    var bounds = null;
+    // Ugh - can't use symbolic constants for layerKind because they
+    // wind up as symbols, not the # they evaluate too.  See CopyCSSToClipboard.jsx
+    // for the definitions.
+    var contentLayerKinds = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 };
+    
+    for (i = 0; i < layers.length; ++i)
+    {
+        if ((typeof layers[i] !== "number")
+            && (layers[i].layerKind in contentLayerKinds)) {
+            var layerBounds = layers[i].getBounds();
+            // Extend bounds by stroke
+            if (layers[i].layerKind === kVectorSheet)
+            {
+                // Check for AGM stroke
+                var strokeWidth = 0;
+                var agmDesc = layers[i].getLayerAttr("AGMStrokeStyleInfo");
+                if (agmDesc && agmDesc.getVal("strokeEnabled")) {
+                    strokeWidth = stripUnits(agmDesc.getVal("strokeStyleLineWidth"));
+                }
+                // Try the layerFX stroke
+                if (strokeWidth === 0) {
+                    var fxDesc = layers[i].getLayerAttr("layerEffects.frameFX");
+                    if (fxDesc && fxDesc.getVal("enabled")
+                        && (fxDesc.getVal("paintType") === "solidColor")) {
+                        strokeWidth = stripUnits(fxDesc.getVal("strokeStyleLineWidth"));
+                    }
+                }
+                strokeWidth *= 0.5;
+                layerBounds[0] -= strokeWidth;
+                layerBounds[1] -= strokeWidth;
+                layerBounds[2] += strokeWidth;
+                layerBounds[3] += strokeWidth;
+            }
+        
+            if (bounds === null) {
+                bounds = layerBounds;
+            }
+            else {
+                for (var j = 0; j < 4; ++j) {
+                    bounds[j] = [Math.min, Math.min, Math.max, Math.max][j](bounds[j], layerBounds[j]);
+                }
+            }
+        }
+    }
+    return bounds;
+};
+
 // This assumes "params" are pre-defined globals
 svg.createSVGText = function ()
 {
@@ -1103,7 +1179,7 @@ svg.createSVGText = function ()
     // which is only available in PS v15 (CC 2014) and up.
     var fixBoundsAvailable = Number(app.version.match(/\d+/)) >= 15;
     
-    var savedLayer, curLayer = PSLayerInfo.layerIDToIndex(params.layerID);
+    var savedLayer, curLayer = PSLayerInfo.layerIDToIndex(params.layerId);
     this.setCurrentLayer(curLayer);
 
     var bounds, wasClean = app.activeDocument.saved;
@@ -1111,12 +1187,11 @@ svg.createSVGText = function ()
     if (fixBoundsAvailable) {
         this.enableGeneratorTrack(false);
 
-        // We have to resort to the DOM here, because:
-        // - Getting the bounds via events fails for groups, and
-        // - Only the active (target) layer can be translated
         savedLayer = app.activeDocument.activeLayer;
         this.currentLayer.makeLayerActive();
-        bounds = app.activeDocument.activeLayer.bounds;
+        bounds = this.findActualBounds();
+        // We have to resort to the DOM here, because
+        // only the active (target) layer can be translated
         app.activeDocument.activeLayer.translate(-bounds[0], -bounds[1]);
     }
     
@@ -1159,9 +1234,17 @@ svg.createSVGText = function ()
 
 svg.createSVGDesc = function ()
 {
+    var saveDocID = null;
+    if (params.documentId && (params.documentId !== app.activeDocument.id)) {
+        saveDocID = app.activeDocument.id;
+        setDocumentByID(params.documentId);
+    }
     var svgResult = this.createSVGText();
     var svgDesc = new ActionDescriptor();
     svgDesc.putString(app.stringIDToTypeID("svgText"), encodeURI(svgResult));
+    if (saveDocID) {
+        setDocumentByID(saveDocID);
+    }
     return svgDesc;
 };
 
