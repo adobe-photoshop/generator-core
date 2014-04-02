@@ -81,7 +81,6 @@ svg.reset = function ()
     this.gradientDict = {};
     // Yes, you really need all this gobbledygook
     this.svgHeader = ['<svg ',
-                      ' version="1.1" baseProfile="full"',
                       ' xmlns="http://www.w3.org/2000/svg"',
                       ' xmlns:xlink="http://www.w3.org/1999/xlink"',
                       '>\n'].join('\n');
