@@ -81,7 +81,6 @@ svg.reset = function ()
     this.gradientDict = {};
     // Yes, you really need all this gobbledygook
     this.svgHeader = ['<svg ',
-                      ' version="1.1" baseProfile="full"',
                       ' xmlns="http://www.w3.org/2000/svg"',
                       ' xmlns:xlink="http://www.w3.org/1999/xlink"',
                       '>\n'].join('\n');
@@ -421,7 +420,7 @@ svg.addInnerShadow = function ()
         var offset = PSLayerInfo.getEffectOffset(inshDesc);
         
         var params = { filterTag: "Filter_" + this.filterID++,
-                       dx: offset[0], dy: offset[1],
+                       dx: stripUnits(offset[0]), dy: stripUnits(offset[1]),
                        blurDist: round1k(Math.sqrt(stripUnits(inshDesc.getVal("blur")))),
                        inshColor: this.currentLayer.replaceDescKey('flood-color="$color$"', inshDesc)[1],
                        opacity: round1k(stripUnits(inshDesc.getVal("opacity")) / 100.0),
@@ -473,7 +472,7 @@ svg.addDropShadow = function ()
                        yoffset: 'y="' + (fxBounds[1] - strokeWidth) + 'px"',
                        fxWidth: 'width="' + (fxBounds[2] - fxBounds[0] + strokeWidth) + 'px"',
                        fxHeight: 'height="' + (fxBounds[3] - fxBounds[1] + strokeWidth) + 'px"',
-                       dx: dsInfo.xoff, dy: dsInfo.yoff,
+                       dx: stripUnits(dsInfo.xoff), dy: stripUnits(dsInfo.yoff),
                        // SVG uses "standard deviation" vs. pixels for the blur distance; sqrt is a rough approximation
                        blurDist: round1k(Math.sqrt(stripUnits(dsInfo.dsDesc.getVal("blur")))),
                        dsColor: this.currentLayer.replaceDescKey('flood-color="$color$"', dsInfo.dsDesc)[1],
