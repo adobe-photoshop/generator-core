@@ -84,6 +84,18 @@
                 setState("4", !states["4"].enabled, states["4"].checked);
             }
         },
+        {
+            id:     "6",
+            name:   "enabled, not checked, toggles when chosen and adds text:",
+            delay:  0,
+            enabled: true,
+            checked: false,
+            nameSuffix: "",
+            action: function () {
+                this.nameSuffix += " hi";
+                setState("6", true, !states["6"].checked, this.name + this.nameSuffix);
+            }
+        }
     ];
 
     function log(s) {
@@ -98,8 +110,8 @@
 
     }
 
-    function setState(id, enabled, checked) {
-        _generator.toggleMenu(prefix + id, enabled, checked).then(
+    function setState(id, enabled, checked, displayName) {
+        _generator.toggleMenu(prefix + id, enabled, checked, displayName).then(
             function () {
                 states[id] = {enabled: enabled, checked: checked};
                 log("toggled menu with id " + id + " to enabled: " + enabled + ", checked: " + checked);
@@ -124,7 +136,7 @@
                 ).then(
                     function () {
                         states[menu.id] = {enabled: menu.enabled, checked: menu.checked};
-                        actions[prefix + menu.id] = menu.action;
+                        actions[prefix + menu.id] = menu.action.bind(menu);
                         log("created menu with id " + menu.id +
                             " and string '" + menu.name +
                             "' after " + menu.delay + "ms");
