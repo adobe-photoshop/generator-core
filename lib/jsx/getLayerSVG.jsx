@@ -33,11 +33,11 @@ function getPSAppPath()
 // Select the document by ID
 function setDocumentByID(id)
 {
-	var desc = new ActionDescriptor();
-	var ref = new ActionReference();
-	ref.putIdentifier(classDocument, id);
-	desc.putReference(typeNULL, ref);
-	executeAction(eventSelect, desc, DialogModes.NO);
+    var desc = new ActionDescriptor();
+    var ref = new ActionReference();
+    ref.putIdentifier(classDocument, id);
+    desc.putReference(typeNULL, ref);
+    executeAction(eventSelect, desc, DialogModes.NO);
 }
 
 // This uses many routines from CopyCSS, so load the script but tell it not to execute first.
