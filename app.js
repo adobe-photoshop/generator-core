@@ -51,8 +51,6 @@
 
 
     var optionParser = optimist["default"]({
-        "r" : "independent",
-        "m" : null,
         "p" : 49494,
         "h" : "localhost",
         "P" : "password",
@@ -64,8 +62,6 @@
     var argv = optionParser
         .usage("Run generator service.\nUsage: $0")
         .describe({
-            "r": "launch reason, one of: independent, menu, metadata, alwayson",
-            "m": "menu ID of action that should be executed immediately after startup",
             "p": "Photoshop server port",
             "h": "Photoshop server host",
             "P": "Photoshop server password",
@@ -74,8 +70,6 @@
             "f": "folder to search for plugins (can be used multiple times)",
             "help": "display help message"
         }).alias({
-            "r": "launchreason",
-            "m": "menu",
             "p": "port",
             "h": "host",
             "P": "password",
