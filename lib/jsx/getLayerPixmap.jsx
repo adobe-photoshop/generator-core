@@ -17,6 +17,13 @@
 //         means that stroke effects (e.g. rounded rect corners) are *not* scaled. (Default: false)
 //   - includeAncestorMasks: setting to "true" causes exported layer to be clipped by any ancestor
 //         masks that are visible (Default: false)
+//   - allowDither: controls whether any dithering could possibly happen in the color conversion
+//         to 8-bit RGB. If false, then dithering will definitely not occur, regardless of either
+//         the value of useColorSettingsDither and the color settings in Photoshop. (Default: false)
+//   - useColorSettingsDither: If allowDither is true, then this controls whether to (if true) defer to
+//         the user's color settings in PS, or (if false) to force dither in any case where a
+//         conversion to 8-bit RGB would otherwise be lossy. If allowDither is false, then the
+//         value of this parameter is ignored. (Default: false)
 
 var MAX_DIMENSION = 10000;
 
@@ -108,6 +115,13 @@ actionDescriptor.putEnumerated(
     stringIDToTypeID("includeLayers"),
     stringIDToTypeID("includeVisible")
 );
+
+// NOTE: on the PS side, allowDither and useColorSettingsDither default to "true" if they are
+// not set at all. However, in Generator, the common case will be that we do NOT want to dither,
+// regardless of the settings in PS. So, on the Generator side, we default to false (hence the !! on
+// the params properties).
+actionDescriptor.putBoolean(stringIDToTypeID("allowDither"), !!params.allowDither);
+actionDescriptor.putBoolean(stringIDToTypeID("useColorSettingsDither"), !!params.useColorSettingsDither);
 
 if (params.boundsOnly) {
     actionDescriptor.putBoolean(stringIDToTypeID("boundsOnly"), params.boundsOnly);
