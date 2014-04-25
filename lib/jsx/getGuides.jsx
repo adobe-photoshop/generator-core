@@ -23,7 +23,7 @@ var guide;
 var coordinate;
 for (var i = 0; i < guides.length; ++i) {
     guide = guides[i];
-    coordinate = parseFloat(guide.coordinate);
+    coordinate = guide.coordinate;
 
     if (guide.direction === Direction.HORIZONTAL) {
         horizontal.push(coordinate);
