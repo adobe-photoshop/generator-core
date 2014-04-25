@@ -10,6 +10,7 @@ var guides = [];
 for (var i = 0; i < app.documents.length; i++) {
     if (app.documents[i].id === params.documentId) {
         guides = app.documents[i].guides;
+        break;
     }
 }
 
