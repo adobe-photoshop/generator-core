@@ -6,16 +6,17 @@ Generator is a JavaScript-based extensibility technology which first shipped in 
 
 Generator Core is under active development. Thorough documentation, example plug-ins, and tutorials are coming soon. In the mean time, please refer to these resources:
 
-
 * [Generator Architecture](https://github.com/adobe-photoshop/generator-core/wiki/Generator-Architecture) -- A wiki page that describes the current overall architecture of Generator.
 * [Generator API Changes](https://github.com/adobe-photoshop/generator-core/wiki/API-Changes) -- A wiki page that describes changes and additions to the Generator Core API over time. 
 * [Image Asset Generation Plug-in](https://github.com/adobe-photoshop/generator-assets) -- A Generator Plug-in that helps users export image assets from their Photoshop files.
 
 ### Developing Generator Plug-ins
 
-* Tom Krcha's [Script Your First Adobe Generator Plugin For Photoshop](http://tomkrcha.com/?p=3896)
-* Tom Krcha's [Sample Plug-in](https://github.com/tomkrcha/generator-getting-started/)
 * Learn how to [setup the Generator development environment](https://github.com/adobe-photoshop/generator-core/wiki/Generator-Development-Environment-Setup)
+* Script your [first Adobe Generator plugin For Photoshop](http://tomkrcha.com/?p=3896)
+* Experiment with a [sample plug-in](https://github.com/adobe-photoshop/generator-getting-started/)
+* Get your Generator development questions answered at the [Adobe-Generator-Dev Google group](https://groups.google.com/forum/#!forum/adobe-generator-dev)
+* Follow [@AdobeGenerator](https://twitter.com/AdobeGenerator) on Twitter for more updates
 
 ### License
 
