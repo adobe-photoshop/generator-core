@@ -13,7 +13,7 @@ Generator Core is under active development. Thorough documentation, example plug
 ### Developing Generator Plug-ins
 
 * Learn how to [setup the Generator development environment](https://github.com/adobe-photoshop/generator-core/wiki/Generator-Development-Environment-Setup)
-* Script your [first Adobe Generator plugin For Photoshop](http://tomkrcha.com/?p=3896)
+* Script your [first Adobe Generator plugin for Photoshop](http://tomkrcha.com/?p=3896)
 * Experiment with a [sample plug-in](https://github.com/adobe-photoshop/generator-getting-started/)
 * Get your Generator development questions answered at the [Adobe-Generator-Dev Google group](https://groups.google.com/forum/#!forum/adobe-generator-dev)
 * Follow [@AdobeGenerator](https://twitter.com/AdobeGenerator) on Twitter for more updates
