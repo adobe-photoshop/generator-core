@@ -71,6 +71,16 @@ if (params.inputRect && params.outputRect) {
     // Absolute scaling may not keep the aspect ratio intact, in which case effects
     // cannot be scaled. To be consistent, turn it off for all of absolute scaling
     // transform.putBoolean(stringIDToTypeID("scaleStyles"), false);
+
+    if (params.interpolationType) {
+        transform.putEnumerated(stringIDToTypeID("interpolation"),
+                                stringIDToTypeID("interpolationType"),
+                                stringIDToTypeID(params.interpolationType));
+
+        actionDescriptor.putEnumerated(stringIDToTypeID("interpolation"),
+                                stringIDToTypeID("interpolationType"),
+                                stringIDToTypeID(params.interpolationType));
+    }
 }
 else if (params.scaleX && params.scaleY && (params.scaleX !== 1 || params.scaleY !== 1)) {
     transform = new ActionDescriptor();
@@ -81,9 +91,16 @@ else if (params.scaleX && params.scaleY && (params.scaleX !== 1 || params.scaleY
 
     transform.putDouble(stringIDToTypeID("width"), params.scaleX * 100);
     transform.putDouble(stringIDToTypeID("height"), params.scaleY * 100);
-    transform.putEnumerated(stringIDToTypeID("interpolation"),
-                            stringIDToTypeID("interpolationType"),
-                            stringIDToTypeID("automaticInterpolation"));
+
+    if (params.interpolationType) {
+        transform.putEnumerated(stringIDToTypeID("interpolation"),
+                                stringIDToTypeID("interpolationType"),
+                                stringIDToTypeID(params.interpolationType));
+
+        actionDescriptor.putEnumerated(stringIDToTypeID("interpolation"),
+                                stringIDToTypeID("interpolationType"),
+                                stringIDToTypeID(params.interpolationType));
+    }
 }
 
 if (transform) {
