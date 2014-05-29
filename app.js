@@ -56,7 +56,7 @@
         "P" : "password",
         "i" : null,
         "o" : null,
-        "f" : null,
+        "f" : null
     });
     
     var argv = optionParser
@@ -75,7 +75,7 @@
             "P": "password",
             "i": "input",
             "o": "output",
-            "f": "pluginfolder",
+            "f": "pluginfolder"
         }).argv;
     
     if (argv.help) {
