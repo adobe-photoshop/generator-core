@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "~0.8",
+    "grunt-contrib-jshint": "~0.10",
     "grunt-contrib-nodeunit": "~0.3",
     "grunt-jscs-checker": "^0.4.4",
     "nodeunit": "~0.8"
