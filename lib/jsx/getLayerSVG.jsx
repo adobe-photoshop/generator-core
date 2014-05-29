@@ -826,7 +826,7 @@ svg.getTextLayerSVG1 = function (fillColor)
             // boundsDesc is from "boundsNoEffects"
             var textShapeDesc = this.getLayerAttr("textKey.textShape");
 
-            if (textShapeDesc.getVal("char")==="box") {
+            if (textShapeDesc.getVal("char") === "box") {
                 isBoxText = true;
                 textBottom = stripUnits(boundsDesc.getVal("bottom")) - stripUnits(boundsDesc.getVal("top"));
                 textBottom += stripUnits(this.getLayerAttr("textKey.bounds.top"));
