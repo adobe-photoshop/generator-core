@@ -4,7 +4,8 @@
 // Required params:
 //   - documentId: The ID of the document requested
 //   - layerSpec: Either the layer ID of the desired layer as a number, or an object of the form
-//         {firstLayerIndex: number, lastLayerIndex: number} specifying the desired index range.
+//         {firstLayerIndex: number, lastLayerIndex: number, ?hidden: Array.<number>} specifying the
+//         desired index range and (optionally) an array of indices to hide.
 //         Note that the number form takes a layer ID, *not* a layer index.
 //   - boundsOnly: Whether to only request the bounds fo the pixmap
 //   Either use absolute scaling by specifying which part of the doc should be transformed into what shape:
@@ -117,6 +118,37 @@ actionDescriptor.putInteger(stringIDToTypeID("format"), 2);
 if (typeof(params.layerSpec) === "object") {
     actionDescriptor.putInteger(stringIDToTypeID("firstLayer"), params.layerSpec.firstLayerIndex);
     actionDescriptor.putInteger(stringIDToTypeID("lastLayer"), params.layerSpec.lastLayerIndex);
+    if (params.layerSpec.hasOwnProperty("hidden") && params.layerSpec.hidden.length > 0) {
+        var i,
+            hiddenIndiciesMap = {},
+            settingsList = new ActionList(),
+            hiddenLayerDesc = new ActionDescriptor(),
+            visibleLayerDesc = new ActionDescriptor(),
+            hiddenLayerSettings = new ActionDescriptor(),
+            lsID = stringIDToTypeID("layerSettings");
+
+        hiddenLayerSettings.putBoolean(stringIDToTypeID("enabled"), false);
+        hiddenLayerDesc.putObject(lsID, lsID, hiddenLayerSettings);
+
+        // We have to add a descriptor for every layer in order, so first
+        // build a map to make it easier to do this.
+        for (i = 0; i < params.layerSpec.hidden.length; ++i) {
+            hiddenIndiciesMap[params.layerSpec.hidden[i]] = true;
+        }
+
+        // Loop over every layer, and add either a hidden or visible descriptor
+        // based on the map we built.
+        for (i = params.layerSpec.firstLayerIndex; i <= params.layerSpec.lastLayerIndex; ++i) {
+            if (hiddenIndiciesMap[i]) {
+                settingsList.putObject(lsID, hiddenLayerDesc);
+            } else {
+                settingsList.putObject(lsID, visibleLayerDesc);
+            }
+        }
+
+        actionDescriptor.putList(stringIDToTypeID("layerSettings"), settingsList);
+    }
+
 } else {
     actionDescriptor.putInteger(stringIDToTypeID("layerID"), params.layerSpec);
 }
