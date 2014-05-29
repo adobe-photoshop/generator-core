@@ -44,6 +44,12 @@ module.exports = function (grunt) {
                 "!www/vendor/**/*.js"
             ]
         },
+        jscs: {
+            src: "<%= jshint.all %>",
+            options: {
+                config: ".jscsrc"
+            }
+        },
 
         nodeunit : {
             all : ["test/test-*.js"]
@@ -52,9 +58,10 @@ module.exports = function (grunt) {
     });
 
     grunt.loadNpmTasks("grunt-contrib-jshint");
+    grunt.loadNpmTasks("grunt-jscs-checker");
     grunt.loadNpmTasks("grunt-contrib-nodeunit");
 
-    grunt.registerTask("test", ["jshint", "nodeunit"]);
+    grunt.registerTask("test", ["jshint", "jscs", "nodeunit"]);
 
     grunt.registerTask("default", ["test"]);
 
