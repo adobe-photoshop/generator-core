@@ -3,7 +3,9 @@
 
 // Required params:
 //   - documentId: The ID of the document requested
-//   - layerId:    The ID of the layer requested
+//   - layerSpec: Either the layer ID of the desired layer as a number, or an object of the form
+//         {firstLayerIndex: number, lastLayerIndex: number} specifying the desired index range.
+//         Note that the number form takes a layer ID, *not* a layer index.
 //   - boundsOnly: Whether to only request the bounds fo the pixmap
 //   Either use absolute scaling by specifying which part of the doc should be transformed into what shape:
 //   - inputRect:  { left: ..., top: ..., right: ..., bottom: ... }
@@ -111,7 +113,14 @@ actionDescriptor.putInteger(stringIDToTypeID("documentID"), params.documentId);
 actionDescriptor.putInteger(stringIDToTypeID("width"), MAX_DIMENSION);
 actionDescriptor.putInteger(stringIDToTypeID("height"), MAX_DIMENSION);
 actionDescriptor.putInteger(stringIDToTypeID("format"), 2);
-actionDescriptor.putInteger(stringIDToTypeID("layerID"), params.layerId);
+
+if (typeof(params.layerSpec) === "object") {
+    actionDescriptor.putInteger(stringIDToTypeID("firstLayer"), params.layerSpec.firstLayerIndex);
+    actionDescriptor.putInteger(stringIDToTypeID("lastLayer"), params.layerSpec.lastLayerIndex);
+} else {
+    actionDescriptor.putInteger(stringIDToTypeID("layerID"), params.layerSpec);
+}
+
 
 if (!params.includeAncestorMasks) {
     actionDescriptor.putEnumerated(
