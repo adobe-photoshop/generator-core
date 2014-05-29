@@ -1,9 +1,10 @@
 {
+    "additionalRules": [ "node_modules/jscs-trailing-whitespace-in-source/rules/*.js" ],
+    "disallowTrailingWhitespaceInSource": true,
     "maximumLineLength": 120,
     "validateLineBreaks": "LF",
     "validateIndentation": 4,
     "disallowMixedSpacesAndTabs": true,
-    // "disallowTrailingWhitespace": true ; required even in comments :(
     "requireLineFeedAtFileEnd": true,
     "disallowTrailingComma": true,
     "validateQuoteMarks": {

@@ -22,6 +22,7 @@
     "grunt-contrib-jshint": "~0.10",
     "grunt-contrib-nodeunit": "~0.3",
     "grunt-jscs-checker": "^0.4.4",
-    "nodeunit": "~0.8"
+    "nodeunit": "~0.8",
+    "jscs-trailing-whitespace-in-source": "0.0.1"
   }
 }
