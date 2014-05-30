@@ -1215,8 +1215,8 @@ svg.createSVGText = function ()
         // PS ignores the stroke when finding the bounds (bug?), so we add in
         // a fudge factor based on the largest stroke width found.
         var halfStrokeWidth = new UnitValue(this.maxStrokeWidth / 2, 'px');
-        var boundsParams = {width: ((bounds[2] - bounds[0]) + halfStrokeWidth).asCSS(),
-                            height: ((bounds[3] - bounds[1]) + halfStrokeWidth).asCSS()};
+        var boundsParams = {width: (((bounds[2] - bounds[0]) + halfStrokeWidth)*params.layerScale).asCSS(),
+                            height: (((bounds[3] - bounds[1]) + halfStrokeWidth)*params.layerScale).asCSS()};
 
         var boundsStr = this.replaceKeywords(' width="$width$" height="$height$">', boundsParams);
         svgResult = svgResult.replace(">", boundsStr);
