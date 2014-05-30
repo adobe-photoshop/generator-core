@@ -84,8 +84,7 @@ if (params.inputRect && params.outputRect) {
                                 stringIDToTypeID("interpolationType"),
                                 stringIDToTypeID(params.interpolationType));
     }
-}
-else if (params.scaleX && params.scaleY && (params.scaleX !== 1 || params.scaleY !== 1)) {
+} else if (params.scaleX && params.scaleY && (params.scaleX !== 1 || params.scaleY !== 1)) {
     transform = new ActionDescriptor();
 
     if (!params.useSmartScaling) {

@@ -1,4 +1,6 @@
 {
+    "fileExtensionsToProcess": [".js", ".jsx"],
+    "excludeFiles": ["lib/jsx/getLayerSVG.jsx"],
     "additionalRules": [ "node_modules/jscs-trailing-whitespace-in-source/rules/*.js" ],
     "disallowTrailingWhitespaceInSource": true,
     "maximumLineLength": 120,
@@ -20,7 +22,6 @@
     "disallowKeywords": ["with", "eval"],
     "disallowImplicitTypeConversion": ["numeric", "binary", "string"],
     "disallowKeywordsOnNewLine": ["else"],
-    "disallowSpacesInsideArrayBrackets": true,
     "requireCapitalizedConstructors": true,
     "safeContextKeyword": [ "that", "self" ],
     "requireCurlyBraces": [
@@ -65,7 +66,6 @@
     ],
     "requireSpaceBeforeBlockStatements": true,
     "requireSpacesInConditionalExpression": true,
-    "requireSpacesInFunctionExpression": true,
     "requireSpacesInAnonymousFunctionExpression": {
         "beforeOpeningRoundBrace": true,
         "beforeOpeningCurlyBrace": true
@@ -77,8 +77,6 @@
     "requireSpacesInFunctionExpression": {
         "beforeOpeningCurlyBrace": true
     },
-    "requireSpaceBeforeBlockStatements": true,
-    "requireSpacesInConditionalExpression": true,
     "disallowSpacesInsideArrayBrackets": true,
     "disallowSpacesInsideParentheses": true,
     "disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~", "!"],
