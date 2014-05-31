@@ -757,6 +757,7 @@ svg.getTextLayerSVG1 = function (fillColor)
     var textDesc = this.getLayerAttr("textKey.textStyleRange.textStyle");
     var leftMargin = "0";
     var textBottom = "0";
+    var isBoxText = false;
     var textDescList = [textDesc];
     var defaultDesc = this.getLayerAttr("textKey.paragraphStyleRange.paragraphStyle.defaultStyle");
     textDescList.push(defaultDesc);
@@ -822,9 +823,17 @@ svg.getTextLayerSVG1 = function (fillColor)
         
         if (! transformMatrixUsed)
         {
-            textBottom = stripUnits(boundsDesc.getVal("top"));
-            var baselineDelta = stripUnits(this.getLayerAttr("textKey.boundingBox.top"));
-            textBottom += -baselineDelta;
+            // boundsDesc is from "boundsNoEffects"
+            var textShapeDesc = this.getLayerAttr("textKey.textShape");
+
+            if (textShapeDesc.getVal("char") === "box") {
+                isBoxText = true;
+                textBottom = stripUnits(boundsDesc.getVal("bottom")) - stripUnits(boundsDesc.getVal("top"));
+                textBottom += stripUnits(this.getLayerAttr("textKey.bounds.top"));
+            }
+            else {
+                textBottom = stripUnits(boundsDesc.getVal("bottom"));
+            }
             leftMargin = boundsDesc.getVal('left'); // For multi-line text
         }
 
@@ -850,7 +859,7 @@ svg.getTextLayerSVG1 = function (fillColor)
                 
         var fontSize = stripUnits(this.getVal2("size", textDescList));
         var fontLeading = textDesc.getVal("leading");
-        fontLeading = fontLeading ? stripUnits(fontLeading) : fontSize;
+        fontLeading = fontLeading ? stripUnits(fontLeading) : fontSize * 1.2;
 
         if (isStyleOn(textDesc, "baseline", "subScript"))
         {
@@ -877,7 +886,8 @@ svg.getTextLayerSVG1 = function (fillColor)
         textStr = this.HTMLEncode(textStr);
 
         // If text is on multiple lines, break it into separate spans.
-        if (textStr.search(/\r/) >= 0)
+        var lineBreaks = textStr.match(/\r/g);
+        if (lineBreaks)
         {
             // Synthesize the line-height from the "leading" (line spacing) / font-size
             var lineHeight = "1.2em";
@@ -889,8 +899,11 @@ svg.getTextLayerSVG1 = function (fillColor)
         
             var topOffset = "";
             if (! transformMatrixUsed) {
-//              topOffset = ' dy="-' + (textStr.match(/\r/g).length * lineHeight) + 'em"';
-                topOffset = ' dy="-' + stripUnits(this.getLayerAttr("textKey.boundingBox.bottom")) + 'px"';
+                if (isBoxText) {
+                    topOffset = ' dy="-' + (lineBreaks.length * lineHeight) + 'em"';
+                } else {
+                    topOffset = ' dy="-' + stripUnits(this.getLayerAttr("textKey.boundingBox.bottom")) + 'px"';
+                }
             }
 
             var textSpans = ' <tspan' + topOffset + '>';
@@ -1202,8 +1215,8 @@ svg.createSVGText = function ()
         // PS ignores the stroke when finding the bounds (bug?), so we add in
         // a fudge factor based on the largest stroke width found.
         var halfStrokeWidth = new UnitValue(this.maxStrokeWidth / 2, 'px');
-        var boundsParams = {width: ((bounds[2] - bounds[0]) + halfStrokeWidth).asCSS(),
-                            height: ((bounds[3] - bounds[1]) + halfStrokeWidth).asCSS()};
+        var boundsParams = {width: (((bounds[2] - bounds[0]) + halfStrokeWidth)*params.layerScale).asCSS(),
+                            height: (((bounds[3] - bounds[1]) + halfStrokeWidth)*params.layerScale).asCSS()};
 
         var boundsStr = this.replaceKeywords(' width="$width$" height="$height$">', boundsParams);
         svgResult = svgResult.replace(">", boundsStr);
