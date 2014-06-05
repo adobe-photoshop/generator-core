@@ -780,7 +780,11 @@ svg.getTextLayerSVG1 = function (fillColor)
             this.addParam('fill', fillColor);
         }
         this.addOpacity();
-        
+
+		// "boundsDesc" is the bounding box of the transformed text (in doc coords)
+		// Original (untransformed, untranslated) text bounding box
+		var originalTextBounds = this.getLayerAttr("textKey.boundingBox");
+
         var transformMatrixUsed = false;
         var textXform = this.getLayerAttr("textKey.transform");
         // Accomodate PS text baseline for vertical position
@@ -794,9 +798,6 @@ svg.getTextLayerSVG1 = function (fillColor)
             if (! ((xx === 1) && (xy === 0) && (yx === 0)
                 && (yy === 1) && (tx === 0) && (ty === 0)))
             {
-                // "boundsDesc" is the bounding box of the transformed text (in doc coords)
-                // Original (untransformed, untranslated) text bounding box
-                var originalTextBounds = this.getLayerAttr("textKey.boundingBox");
                 midval = function (key0, key1, desc, op) {
                     return op(stripUnits(desc.getVal(key0)), stripUnits(desc.getVal(key1))) / 2.0;
                 };
@@ -820,21 +821,43 @@ svg.getTextLayerSVG1 = function (fillColor)
                 transformMatrixUsed = true;
             }
         }
-        
+
+        // Extract the actual text
+        var textStr = this.getLayerAttr('textKey').getVal('textKey');
+        // SVG doesn't have native support for all caps
+        if (isStyleOn(textDesc, "fontCaps", /^allCaps/)) {
+            textStr = textStr.toUpperCase();
+        }
+        // Weed out < > & % @ ! # etc.
+        textStr = this.HTMLEncode(textStr);
+        // If text is on multiple lines, break it into separate spans.
+        var lineBreaks = textStr.match(/\r/g);
+
         if (! transformMatrixUsed)
         {
             // boundsDesc is from "boundsNoEffects"
+            // originalTextBounds is textKey.boundingBox
             var textShapeDesc = this.getLayerAttr("textKey.textShape");
 
             if (textShapeDesc.getVal("char") === "box") {
                 isBoxText = true;
                 textBottom = stripUnits(boundsDesc.getVal("bottom")) - stripUnits(boundsDesc.getVal("top"));
-                textBottom += stripUnits(this.getLayerAttr("textKey.bounds.top"));
+                if (lineBreaks) {
+                    textBottom -= stripUnits(this.getLayerAttr("textKey.bounds.bottom")) 
+                                 - stripUnits(originalTextBounds.getVal("bottom"));
+                }
+                else {
+                    textBottom += stripUnits(this.getLayerAttr("textKey.bounds.top"));
+                }
             }
             else {
                 textBottom = stripUnits(boundsDesc.getVal("bottom"));
             }
             leftMargin = boundsDesc.getVal('left'); // For multi-line text
+
+            if (! isBoxText && !lineBreaks) {
+                textBottom = textBottom - stripUnits(originalTextBounds.getVal('bottom'));
+            }
         }
 
         // This table is: [PS Style event key ; PS event value keyword to search for ; corresponding SVG]
@@ -875,18 +898,6 @@ svg.getTextLayerSVG1 = function (fillColor)
         }
         this.addText('>');
 
-        var textStr = this.getLayerAttr('textKey').getVal('textKey');
-
-        // SVG doesn't have native support for all caps
-        if (isStyleOn(textDesc, "fontCaps", /^allCaps/)) {
-            textStr = textStr.toUpperCase();
-        }
-            
-        // Weed out < > & % @ ! # etc.
-        textStr = this.HTMLEncode(textStr);
-
-        // If text is on multiple lines, break it into separate spans.
-        var lineBreaks = textStr.match(/\r/g);
         if (lineBreaks)
         {
             // Synthesize the line-height from the "leading" (line spacing) / font-size
