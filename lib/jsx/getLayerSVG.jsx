@@ -856,7 +856,6 @@ svg.getTextLayerSVG1 = function (fillColor)
             leftMargin = boundsDesc.getVal('left'); // For multi-line text
 
             if (! isBoxText && !lineBreaks) {
-                leftMargin = "-" + originalTextBounds.getVal('left');
                 textBottom = textBottom - stripUnits(originalTextBounds.getVal('bottom'));
             }
         }
