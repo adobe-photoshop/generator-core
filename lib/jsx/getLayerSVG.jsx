@@ -821,8 +821,8 @@ svg.getTextLayerSVG1 = function (fillColor)
                 transformMatrixUsed = true;
             }
         }
-	
-	   // Extract the actual text
+
+        // Extract the actual text
         var textStr = this.getLayerAttr('textKey').getVal('textKey');
         // SVG doesn't have native support for all caps
         if (isStyleOn(textDesc, "fontCaps", /^allCaps/)) {
@@ -836,17 +836,29 @@ svg.getTextLayerSVG1 = function (fillColor)
         if (! transformMatrixUsed)
         {
             // boundsDesc is from "boundsNoEffects"
+            // originalTextBounds is textKey.boundingBox
             var textShapeDesc = this.getLayerAttr("textKey.textShape");
 
             if (textShapeDesc.getVal("char") === "box") {
                 isBoxText = true;
                 textBottom = stripUnits(boundsDesc.getVal("bottom")) - stripUnits(boundsDesc.getVal("top"));
-                textBottom += stripUnits(this.getLayerAttr("textKey.bounds.top"));
+                if (lineBreaks) {
+                    textBottom -= stripUnits(this.getLayerAttr("textKey.bounds.bottom")) 
+                                 - stripUnits(originalTextBounds.getVal("bottom"));
+                }
+                else {
+                    textBottom += stripUnits(this.getLayerAttr("textKey.bounds.top"));
+                }
             }
             else {
                 textBottom = stripUnits(boundsDesc.getVal("bottom"));
             }
             leftMargin = boundsDesc.getVal('left'); // For multi-line text
+
+            if (! isBoxText && !lineBreaks) {
+                leftMargin = "-" + originalTextBounds.getVal('left');
+                textBottom = textBottom - stripUnits(originalTextBounds.getVal('bottom'));
+            }
         }
 
         // This table is: [PS Style event key ; PS event value keyword to search for ; corresponding SVG]
@@ -882,11 +894,6 @@ svg.getTextLayerSVG1 = function (fillColor)
         this.addParam('font-size', fontSize + 'px');
         if (! transformMatrixUsed)
         {
-		   if (! isBoxText && !lineBreaks)
-		   {
-			   leftMargin = "-" + originalTextBounds.getVal('left');
-			   textBottom = textBottom - stripUnits(originalTextBounds.getVal('bottom'));
-		   }
             this.addParam('x', leftMargin);
             this.addParam('y', textBottom + 'px');
         }
