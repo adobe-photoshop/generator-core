@@ -84,6 +84,7 @@ svg.reset = function ()
                       ' xmlns="http://www.w3.org/2000/svg"',
                       ' xmlns:xlink="http://www.w3.org/1999/xlink"',
                       '>\n'].join('\n');
+	this.svgResult = "";
 };
 
 // Convert special characters to &#NN; form.  Note '\r' is
@@ -162,6 +163,12 @@ svg.killLastHistoryState = function ()
     delRef.putProperty(classHistoryState, keyCurrentHistoryState);
     delDesc.putReference(typeNULL, delRef);
     executeAction(eventDelete, delDesc, DialogModes.NO);
+};
+
+// Undo the last operation
+svg.undoLastEvent = function()
+{
+    executeAction( app.charIDToTypeID('undo'), undefined, DialogModes.NO );
 };
 
 // Setting this to "false" tunes out Generator, so changes made in the script
@@ -1232,7 +1239,6 @@ svg.createSVGText = function ()
         var boundsStr = this.replaceKeywords(' width="$width$" height="$height$">', boundsParams);
         svgResult = svgResult.replace(">", boundsStr);
 
-        this.killLastHistoryState();    // Pretend translate never happened
         app.activeDocument.activeLayer = savedLayer;
         if (wasClean) {                 // If saveState was clean, pretend we never touched it
             executeAction(app.stringIDToTypeID("resetDocumentChanged"),
@@ -1252,6 +1258,7 @@ svg.createSVGText = function ()
         svgResult += '</g>';
     }
     svgResult += "</svg>";
+    this.svgResult = svgResult;
     return svgResult;
 };
 
@@ -1262,9 +1269,10 @@ svg.createSVGDesc = function ()
         saveDocID = app.activeDocument.id;
         setDocumentByID(params.documentId);
     }
-    var svgResult = this.createSVGText();
+    app.activeDocument.suspendHistory( "svg gen", "svg.createSVGText();" );
+    this.undoLastEvent();
     var svgDesc = new ActionDescriptor();
-    svgDesc.putString(app.stringIDToTypeID("svgText"), encodeURI(svgResult));
+    svgDesc.putString(app.stringIDToTypeID("svgText"), encodeURI(this.svgResult));
     if (saveDocID) {
         setDocumentByID(saveDocID);
     }
