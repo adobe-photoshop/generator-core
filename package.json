@@ -22,7 +22,7 @@
     "grunt-contrib-jshint": "~0.10",
     "grunt-contrib-nodeunit": "~0.3",
     "grunt-jscs-checker":
-      "git+https://github.com/joelrbrandt/grunt-jscs-checker.git#46954ba3c85d939c22870cc83f098aca14aef80d",
+      "git+https://github.com/joelrbrandt/grunt-jscs-checker.git#83a147044996eb0e4e77227fe3515f07366b49fc",
     "nodeunit": "~0.8",
     "jscs-trailing-whitespace-in-source": "0.0.1"
   }
