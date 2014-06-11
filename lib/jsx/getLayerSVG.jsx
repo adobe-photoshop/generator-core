@@ -1248,7 +1248,7 @@ svg.createSVGText = function ()
     }
        
     if (svg.svgDefs.length > 0) {
-        svgResult += "<defs>\n" + svg.svgDefs + "\n</defs>";
+        svgResult += "<defs>\n" + svg.svgDefs + "\n</defs>\n";
     }
     if (params.layerScale !== 1) {
         svgResult += '<g transform="scale(' + round1k(params.layerScale) + ')" >';
