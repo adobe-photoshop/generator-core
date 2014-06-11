@@ -1,5 +1,5 @@
 {
-    "fileExtensionsToProcess": [".js", ".jsx"],
+    "fileExtensions": [".js", ".jsx"],
     "excludeFiles": ["lib/jsx/getLayerSVG.jsx"],
     "additionalRules": [ "node_modules/jscs-trailing-whitespace-in-source/rules/*.js" ],
     "disallowTrailingWhitespaceInSource": true,
