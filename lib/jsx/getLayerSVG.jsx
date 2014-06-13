@@ -636,8 +636,8 @@ svg.getShapeLayerSVG = function ()
         if (fxDesc && fxDesc.getVal("enabled")
             && (fxDesc.getVal("paintType") === "solidColor"))
         {
-            svg.addAttribute(" stroke-width=$strokeStyleLineWidth$", fxDesc);
-            svg.addAttribute(" stroke=$strokeStyleContent.color$", fxDesc);
+            svg.addAttribute(' stroke-width="$size$"', fxDesc);
+            svg.addAttribute(' stroke="$color$"', fxDesc);
         }
     }
 
@@ -1177,7 +1177,7 @@ svg.findActualBounds = function ()
                     var fxDesc = layers[i].getLayerAttr("layerEffects.frameFX");
                     if (fxDesc && fxDesc.getVal("enabled")
                         && (fxDesc.getVal("paintType") === "solidColor")) {
-                        strokeWidth = stripUnits(fxDesc.getVal("strokeStyleLineWidth"));
+                        strokeWidth = stripUnits(fxDesc.getVal("size"));
                     }
                 }
                 strokeWidth *= 0.5;
