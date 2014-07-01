@@ -27,6 +27,14 @@
 //         the user's color settings in PS, or (if false) to force dither in any case where a
 //         conversion to 8-bit RGB would otherwise be lossy. If allowDither is false, then the
 //         value of this parameter is ignored. (Default: false)
+//   - interpolationType: Force pixmap scaling to use the given interpolation method.
+//         If defined, the value should be one of the Generator.prototype.INTERPOLATION constants. Otherwise,
+//         Photoshop's default interpolation type (as specified in Preferences > Image Interpolation) is used.
+//         (Default: undefined)
+//   - forceSmartPSDPixelScaling: If true, forces PSD Smart objects to be scaled completely in pixel space
+//         (as opposed to scaling vectors, text, etc. in a smoother fashion.) In PS 15.0 and earlier
+//         pixel space scaling was the only option. So, setting this to "true" will replicate older behavior
+//         (Default: false)
 
 var MAX_DIMENSION = 10000;
 
@@ -36,10 +44,6 @@ var actionDescriptor = new ActionDescriptor(),
 // Add a transform if necessary
 if (params.inputRect && params.outputRect) {
     transform = new ActionDescriptor();
-
-    if (!params.useSmartScaling) {
-        transform.putBoolean(stringIDToTypeID("forceDumbScaling"), true);
-    }
 
     // The part of the document to use
     var inputRect   = params.inputRect,
@@ -75,15 +79,6 @@ if (params.inputRect && params.outputRect) {
     // cannot be scaled. To be consistent, turn it off for all of absolute scaling
     // transform.putBoolean(stringIDToTypeID("scaleStyles"), false);
 
-    if (params.interpolationType) {
-        transform.putEnumerated(stringIDToTypeID("interpolation"),
-                                stringIDToTypeID("interpolationType"),
-                                stringIDToTypeID(params.interpolationType));
-
-        actionDescriptor.putEnumerated(stringIDToTypeID("interpolation"),
-                                stringIDToTypeID("interpolationType"),
-                                stringIDToTypeID(params.interpolationType));
-    }
 } else if (params.scaleX && params.scaleY && (params.scaleX !== 1 || params.scaleY !== 1)) {
     transform = new ActionDescriptor();
 
@@ -93,8 +88,18 @@ if (params.inputRect && params.outputRect) {
 
     transform.putDouble(stringIDToTypeID("width"), params.scaleX * 100);
     transform.putDouble(stringIDToTypeID("height"), params.scaleY * 100);
+}
 
-    if (params.interpolationType) {
+if (transform) {
+    // interpolation and scaling options are only relevant in cases where a transform
+    // is going to happen. So, we only bother to set them if we're actually going
+    // to add a transform descriptor
+
+    if (!params.useSmartScaling) {
+        transform.putBoolean(stringIDToTypeID("forceDumbScaling"), true);
+    }
+
+    if (params.hasOwnProperty("interpolationType")) {
         transform.putEnumerated(stringIDToTypeID("interpolation"),
                                 stringIDToTypeID("interpolationType"),
                                 stringIDToTypeID(params.interpolationType));
@@ -103,9 +108,12 @@ if (params.inputRect && params.outputRect) {
                                 stringIDToTypeID("interpolationType"),
                                 stringIDToTypeID(params.interpolationType));
     }
-}
 
-if (transform) {
+    if (params.hasOwnProperty("forceSmartPSDPixelScaling")) {
+        transform.putBoolean(stringIDToTypeID("forceSmartPSDPixelScaling"), !!params.forceSmartPSDPixelScaling);
+    }
+
+    // actually add the transform descriptor to the main descriptor
     actionDescriptor.putObject(stringIDToTypeID("transform"), stringIDToTypeID("transform"), transform);
 }
 
