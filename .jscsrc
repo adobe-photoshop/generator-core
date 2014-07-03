@@ -1,6 +1,5 @@
 {
     "fileExtensions": [".js", ".jsx"],
-    "excludeFiles": ["lib/jsx/getLayerSVG.jsx"],
     "additionalRules": [ "node_modules/jscs-trailing-whitespace-in-source/rules/*.js" ],
     "disallowTrailingWhitespaceInSource": true,
     "maximumLineLength": 120,
@@ -83,9 +82,7 @@
     "disallowSpaceBeforePostfixUnaryOperators": ["++", "--"],
     "requireParenthesesAroundIIFE": true,
     "requireBlocksOnNewline": 1,
-    "requireCommaBeforeLineBreak": true,
-    "requireRightStickedOperators": ["!"],
-    "requireLeftStickedOperators": [","]
+    "requireCommaBeforeLineBreak": true
     //    "disallowSpaceAfterObjectKeys": true, ; we should pick one of these
     //    "requireSpaceAfterObjectKeys": true,
     //    "requireAlignedObjectValues": "all", ; nice to have... 
