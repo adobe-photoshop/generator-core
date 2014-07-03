@@ -33,33 +33,42 @@ module.exports = function (grunt) {
             options : {
                 jshintrc : ".jshintrc"
             },
-            all : [
+            js : [
                 "*.js",
-                "package.json",
-                ".jshintrc",
-                ".jscsrc",
                 "lib/**/*.js",
-                "lib/jsx/**/*.jsx",
                 "test/**/*.js",
                 "www/**/*.js",
                 "!www/vendor/**/*.js"
+            ],
+            jsx : [
+                "lib/**/*.jsx"
+            ],
+            json : [
+                "package.json",
+                ".jshintrc",
+                ".jscsrc"
             ]
         },
+        
         jscs: {
-            src: "<%= jshint.all %>",
+            js: "<%= jshint.js %>",
+            jsx: [
+                "<%= jshint.jsx %>",
+                "!lib/jsx/getLayerSVG.jsx"
+            ],
             options: {
                 config: ".jscsrc"
             }
         },
-
+        
         nodeunit : {
             all : ["test/test-*.js"]
         }
-                
+
     });
 
     grunt.loadNpmTasks("grunt-contrib-jshint");
-    grunt.loadNpmTasks("grunt-jscs-checker");
+    grunt.loadNpmTasks("grunt-jscs");
     grunt.loadNpmTasks("grunt-contrib-nodeunit");
 
     grunt.registerTask("test", ["jshint", "jscs", "nodeunit"]);
