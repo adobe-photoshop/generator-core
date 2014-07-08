@@ -993,7 +993,9 @@ svg.walkLayerGroup = function (processAllLayers)
 {
     function isSVGLayerKind(kind)
     {
-        return (cssToClip.isCSSLayerKind(kind) || (kind === kAdjustmentSheet));
+        return (cssToClip.isCSSLayerKind(kind)
+                || (kind === kAdjustmentSheet)
+                || (kind === kSmartObjectSheet));
     }
 
     processAllLayers = (typeof processAllLayers === "undefined") ? false : processAllLayers;
