@@ -636,7 +636,11 @@ svg.getShapeLayerSVG = function ()
     var gradOverlayID = this.addGradientOverlay();
 
     // For now, Everything Is A Path.  We'll revisit this when shape meta-data is available.
-    this.addText("<path fill-rule=\"evenodd\" ");
+    if (svg.getLayerAttr("layerPathComponentCount") > 1) {
+        this.addText("<path ");
+    } else {
+        this.addText("<path fill-rule=\"evenodd\" ");
+    }
     
     // If there's a gradient overlay effect, the stroke must be added there.
     if (! gradOverlayID) {
