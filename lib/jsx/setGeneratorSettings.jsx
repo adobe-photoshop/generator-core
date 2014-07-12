@@ -12,7 +12,7 @@ var classNull      = charIDToTypeID("null");
 var typeOrdinal    = charIDToTypeID("Ordn");
 var enumTarget     = charIDToTypeID("Trgt");
 var classDocument  = charIDToTypeID("Dcmn");
-// var classLayer     = charIDToTypeID("Lyr ");
+var classLayer     = charIDToTypeID("Lyr ");
 var propProperty   = stringIDToTypeID("property");
 var actionSet      = charIDToTypeID("setd");
 var keyTo          = charIDToTypeID("T   ");
@@ -31,11 +31,18 @@ for (var key in settings) {
 var theRef = new ActionReference();
 // Property needs to come first
 theRef.putProperty(classProperty, stringIDToTypeID("generatorSettings"));
-theRef.putEnumerated(classDocument, typeOrdinal, enumTarget);
+
+if (params.layerId) {
+    theRef.putIdentifier(classLayer, params.layerId);
+}
+else {
+    theRef.putEnumerated(classDocument, typeOrdinal, enumTarget);
+}
 
 // Execute the set action setting the descriptor into the property reference
 var setDescriptor = new ActionDescriptor();
 setDescriptor.putReference(propNull, theRef);
+
 setDescriptor.putObject(keyTo, classNull, generatorSettingsDesc);
 if (params.key) {
     setDescriptor.putString(propProperty, params.key);

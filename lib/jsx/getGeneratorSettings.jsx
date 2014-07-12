@@ -11,14 +11,18 @@ var propNull       = charIDToTypeID("null");
 var typeOrdinal    = charIDToTypeID("Ordn");
 var enumTarget     = charIDToTypeID("Trgt");
 var classDocument  = charIDToTypeID("Dcmn");
-// var classLayer     = charIDToTypeID("Lyr ");
+var classLayer     = charIDToTypeID("Lyr ");
 var propProperty   = stringIDToTypeID("property");
 var actionGet      = charIDToTypeID("getd");
 var actionSendJSON = stringIDToTypeID("sendJSONToNetworkClient");
 
 var theRef = new ActionReference();
 theRef.putProperty(classProperty, stringIDToTypeID("generatorSettings"));
-if (params.documentId) {
+
+if (params.layerId) {
+    theRef.putIdentifier(classLayer, params.layerId);
+}
+else if (params.documentId) {
     theRef.putIdentifier(classDocument, params.documentId);
 } else {
     theRef.putEnumerated(classDocument, typeOrdinal, enumTarget);
