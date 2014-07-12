@@ -9,6 +9,7 @@ Generator Core is under active development. Thorough documentation, example plug
 * [Generator Architecture](https://github.com/adobe-photoshop/generator-core/wiki/Generator-Architecture) -- A wiki page that describes the current overall architecture of Generator.
 * [Generator API Changes](https://github.com/adobe-photoshop/generator-core/wiki/API-Changes) -- A wiki page that describes changes and additions to the Generator Core API over time. 
 * [Image Asset Generation Plug-in](https://github.com/adobe-photoshop/generator-assets) -- A Generator Plug-in that helps users export image assets from their Photoshop files.
+* [List of (known) Generator Plug-ins](https://github.com/adobe-photoshop/generator-core/wiki/Generator-Plug-ins)
 
 ### Developing Generator Plug-ins
 
