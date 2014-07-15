@@ -28,6 +28,33 @@
       "version": "2.3.1",
       "from": "semver@~2.3",
       "resolved": "https://registry.npmjs.org/semver/-/semver-2.3.1.tgz"
+    },
+    "ws": {
+      "version": "0.4.31",
+      "from": "ws@^0.4.31",
+      "resolved": "https://registry.npmjs.org/ws/-/ws-0.4.31.tgz",
+      "dependencies": {
+        "commander": {
+          "version": "0.6.1",
+          "from": "commander@~0.6.1",
+          "resolved": "https://registry.npmjs.org/commander/-/commander-0.6.1.tgz"
+        },
+        "nan": {
+          "version": "0.3.2",
+          "from": "nan@~0.3.0",
+          "resolved": "https://registry.npmjs.org/nan/-/nan-0.3.2.tgz"
+        },
+        "tinycolor": {
+          "version": "0.0.1",
+          "from": "tinycolor@0.x",
+          "resolved": "https://registry.npmjs.org/tinycolor/-/tinycolor-0.0.1.tgz"
+        },
+        "options": {
+          "version": "0.0.5",
+          "from": "options@>=0.0.5",
+          "resolved": "https://registry.npmjs.org/options/-/options-0.0.5.tgz"
+        }
+      }
     }
   }
 }

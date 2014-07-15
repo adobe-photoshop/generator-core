@@ -15,7 +15,8 @@
   "dependencies": {
     "optimist": "~0.6",
     "q": "~1.0",
-    "semver": "~2.3"
+    "semver": "~2.3",
+    "ws": "^0.4.31"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
