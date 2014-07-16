@@ -3,8 +3,11 @@
 
 // Required params:
 //   - settings: An object specifying generatorSettings
+//   - layerId: ID of the layer for which settings should be updated.
 // Optional params:
 //   - key: The only entry of generatorSettings to set
+//   - documentId: ID of the document for which settings should updated.
+//      Defaults to the current document.
 
 var classProperty  = charIDToTypeID("Prpr");
 var propNull       = charIDToTypeID("null");
@@ -34,6 +37,10 @@ theRef.putProperty(classProperty, stringIDToTypeID("generatorSettings"));
 
 if (params.layerId) {
     theRef.putIdentifier(classLayer, params.layerId);
+}
+
+if (params.documentId) {
+    theRef.putIdentifier(classDocument, params.documentId);
 } else {
     theRef.putEnumerated(classDocument, typeOrdinal, enumTarget);
 }
