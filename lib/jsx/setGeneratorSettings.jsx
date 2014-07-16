@@ -34,8 +34,7 @@ theRef.putProperty(classProperty, stringIDToTypeID("generatorSettings"));
 
 if (params.layerId) {
     theRef.putIdentifier(classLayer, params.layerId);
-}
-else {
+} else {
     theRef.putEnumerated(classDocument, typeOrdinal, enumTarget);
 }
 
