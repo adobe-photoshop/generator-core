@@ -31,27 +31,12 @@
     },
     "ws": {
       "version": "0.4.31",
-      "from": "ws@^0.4.31",
-      "resolved": "https://registry.npmjs.org/ws/-/ws-0.4.31.tgz",
+      "from": "ws@git+https://github.com/adobe-photoshop/ws.git#v0.4.31-no-native",
+      "resolved": "git+https://github.com/adobe-photoshop/ws.git#f89590b37ef8ba322636e8ef8187252c06eec143",
       "dependencies": {
-        "commander": {
-          "version": "0.6.1",
-          "from": "commander@~0.6.1",
-          "resolved": "https://registry.npmjs.org/commander/-/commander-0.6.1.tgz"
-        },
-        "nan": {
-          "version": "0.3.2",
-          "from": "nan@~0.3.0",
-          "resolved": "https://registry.npmjs.org/nan/-/nan-0.3.2.tgz"
-        },
-        "tinycolor": {
-          "version": "0.0.1",
-          "from": "tinycolor@0.x",
-          "resolved": "https://registry.npmjs.org/tinycolor/-/tinycolor-0.0.1.tgz"
-        },
         "options": {
           "version": "0.0.5",
-          "from": "options@>=0.0.5",
+          "from": "options@0.0.5",
           "resolved": "https://registry.npmjs.org/options/-/options-0.0.5.tgz"
         }
       }
