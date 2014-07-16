@@ -16,7 +16,7 @@
     "optimist": "~0.6",
     "q": "~1.0",
     "semver": "~2.3",
-    "ws": "^0.4.31"
+    "ws": "git+https://github.com/adobe-photoshop/ws.git#v0.4.31-no-native"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
