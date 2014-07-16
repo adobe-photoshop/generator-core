@@ -991,65 +991,14 @@ svg.getImageLayerSVG = function ()
 // the whole document).
 svg.walkLayerGroup = function (processAllLayers)
 {
+
     function isSVGLayerKind(kind)
     {
         return (cssToClip.isCSSLayerKind(kind)
                 || (kind === kAdjustmentSheet)
                 || (kind === kSmartObjectSheet));
     }
-
-    processAllLayers = (typeof processAllLayers === "undefined") ? false : processAllLayers;
-    // If processing all of the layers, don't stop at the end of the first group
-    var layerLevel = processAllLayers ? 2 : 1;
-    var visibleLevel = layerLevel;
-    var curIndex = this.currentLayer.index;
-    var saveGroup = [];
-    if (this.currentLayer.layerKind === kLayerGroupSheet)
-    {
-        if (! this.currentLayer.visible) {
-            return;
-        }
-        curIndex--; // Step to next layer in group so layerLevel is correct
-    }
-
-    var groupLayers = [];
-    while ((curIndex > 0) && (layerLevel > 0))
-    {
-        var nextLayer = new PSLayerInfo(curIndex, false);
-        if (isSVGLayerKind(nextLayer.layerKind))
-        {
-            if (nextLayer.layerKind === kLayerGroupSheet)
-            {
-                if (nextLayer.visible && (visibleLevel === layerLevel)) {
-                    visibleLevel++;
-                    // The layers and section bounds must be swapped
-                    // in order to process the group's layerFX 
-                    saveGroup.push(nextLayer);
-                    groupLayers.push(kHiddenSectionBounder);
-                }
-                layerLevel++;
-            }
-            else
-            {
-                if (nextLayer.visible && (visibleLevel === layerLevel)) {
-                    groupLayers.push(nextLayer);
-                }
-            }
-        }
-        else
-        if (nextLayer.layerKind === kHiddenSectionBounder)
-        {
-            layerLevel--;
-            if (layerLevel < visibleLevel) {
-                visibleLevel = layerLevel;
-                if (saveGroup.length > 0) {
-                    groupLayers.push(saveGroup.pop());
-                }
-            }
-        }
-        curIndex--;
-    }
-    return groupLayers;
+    return cssToClip.getGroupLayers( this.currentLayer, isSVGLayerKind, processAllLayers );
 };
 
 svg.getGroupLayerSVG = function (processAllLayers)
