@@ -4,8 +4,8 @@
 // Required params:
 //   - documentId: The ID of the document requested
 //   - layerSpec: Either the layer ID of the desired layer as a number, or an object of the form
-//         {firstLayerIndex: number, lastLayerIndex: number, =hidden: Array.<number>} specifying the
-//         desired index range, inclusive, and (optionally) an array of indices to hide.
+//         {compId: number, compIndex: number, firstLayerIndex: number, lastLayerIndex: number, =hidden: Array.<number>} specifying the
+//         layer comp ID (optionally and exclusive of comp index), layer comp index (optionally and exclusive of comp ID), desired index range, inclusive, and (optionally) an array of indices to hide.
 //         Note that the number form takes a layer ID, *not* a layer index.
 //   - boundsOnly: Whether to only request the bounds fo the pixmap
 //   Either use absolute scaling by specifying which part of the doc should be transformed into what shape:
@@ -158,6 +158,8 @@ if (typeof(params.layerSpec) === "object") {
     
     if (params.layerSpec.hasOwnProperty("compId")) {
         actionDescriptor.putInteger(stringIDToTypeID( "compID" ), params.layerSpec.compId);
+    } else if (params.layerSpec.hasOwnProperty("compIndex")) {
+        actionDescriptor.putInteger(stringIDToTypeID( "compIndex" ), params.layerSpec.compIndex);
     }
 
 } else {
