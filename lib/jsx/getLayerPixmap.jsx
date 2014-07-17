@@ -155,6 +155,10 @@ if (typeof(params.layerSpec) === "object") {
 
         actionDescriptor.putList(stringIDToTypeID("layerSettings"), settingsList);
     }
+    
+    if (params.layerSpec.hasOwnProperty("compId")) {
+        actionDescriptor.putInteger(stringIDToTypeID( "compID" ), params.layerSpec.compId);
+    }
 
 } else {
     actionDescriptor.putInteger(stringIDToTypeID("layerID"), params.layerSpec);
@@ -180,6 +184,7 @@ actionDescriptor.putEnumerated(
     stringIDToTypeID("includeLayers"),
     stringIDToTypeID("includeVisible")
 );
+
 
 // NOTE: on the PS side, allowDither and useColorSettingsDither default to "true" if they are
 // not set at all. However, in Generator, the common case will be that we do NOT want to dither,
