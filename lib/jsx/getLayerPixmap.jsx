@@ -158,15 +158,15 @@ if (typeof(params.layerSpec) === "object") {
 
         actionDescriptor.putList(stringIDToTypeID("layerSettings"), settingsList);
     }
-    
-    if (params.hasOwnProperty("compId")) {
-        actionDescriptor.putInteger(stringIDToTypeID("compID"), params.compId);
-    } else if (params.hasOwnProperty("compIndex")) {
-        actionDescriptor.putInteger(stringIDToTypeID("compIndex"), params.compIndex);
-    }
 
 } else {
     actionDescriptor.putInteger(stringIDToTypeID("layerID"), params.layerSpec);
+}
+
+if (params.hasOwnProperty("compId")) {
+    actionDescriptor.putInteger(stringIDToTypeID("compID"), params.compId);
+} else if (params.hasOwnProperty("compIndex")) {
+    actionDescriptor.putInteger(stringIDToTypeID("compIndex"), params.compIndex);
 }
 
 
