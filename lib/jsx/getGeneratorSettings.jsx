@@ -21,7 +21,9 @@ theRef.putProperty(classProperty, stringIDToTypeID("generatorSettings"));
 
 if (params.layerId) {
     theRef.putIdentifier(classLayer, params.layerId);
-} else if (params.documentId) {
+}
+
+if (params.documentId) {
     theRef.putIdentifier(classDocument, params.documentId);
 } else {
     theRef.putEnumerated(classDocument, typeOrdinal, enumTarget);
