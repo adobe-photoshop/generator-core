@@ -4,7 +4,7 @@
 // Required params:
 //   - documentId: The ID of the document requested
 //   - layerSpec: Either the layer ID of the desired layer as a number, or an object of the form
-//         {firstLayerIndex: number, lastLayerIndex: number, =hidden: Array.<number>} specifying the
+//         {firstLayerIndex: number, lastLayerIndex: number, hidden: Array.<number>=} specifying the
 //         desired index range, inclusive, and (optionally) an array of indices to hide.
 //         Note that the number form takes a layer ID, *not* a layer index.
 //   - boundsOnly: Whether to only request the bounds fo the pixmap
@@ -35,6 +35,8 @@
 //         (as opposed to scaling vectors, text, etc. in a smoother fashion.) In PS 15.0 and earlier
 //         pixel space scaling was the only option. So, setting this to "true" will replicate older behavior
 //         (Default: false)
+//   - compId: number, layer comp ID (optionally and exclusive of compIndex)
+//   - compIndex: number, layer comp index (optionally and exclusive of compId) 
 
 var MAX_DIMENSION = 10000;
 
@@ -160,6 +162,11 @@ if (typeof(params.layerSpec) === "object") {
     actionDescriptor.putInteger(stringIDToTypeID("layerID"), params.layerSpec);
 }
 
+if (params.hasOwnProperty("compId")) {
+    actionDescriptor.putInteger(stringIDToTypeID("compID"), params.compId);
+} else if (params.hasOwnProperty("compIndex")) {
+    actionDescriptor.putInteger(stringIDToTypeID("compIndex"), params.compIndex);
+}
 
 if (!params.includeAncestorMasks) {
     actionDescriptor.putEnumerated(
