@@ -4,9 +4,8 @@
 // Required params:
 //   - documentId: The ID of the document requested
 //   - layerSpec: Either the layer ID of the desired layer as a number, or an object of the form
-//         {firstLayerIndex: number, lastLayerIndex: number, =hidden: Array.<number>}
-//         specifying the desired index range, inclusive, 
-//         and (optionally) an array of indices to hide.
+//         {firstLayerIndex: number, lastLayerIndex: number, hidden: Array.<number>=} specifying the
+//         desired index range, inclusive, and (optionally) an array of indices to hide.
 //         Note that the number form takes a layer ID, *not* a layer index.
 //   - boundsOnly: Whether to only request the bounds fo the pixmap
 //   Either use absolute scaling by specifying which part of the doc should be transformed into what shape:
@@ -169,7 +168,6 @@ if (params.hasOwnProperty("compId")) {
     actionDescriptor.putInteger(stringIDToTypeID("compIndex"), params.compIndex);
 }
 
-
 if (!params.includeAncestorMasks) {
     actionDescriptor.putEnumerated(
         stringIDToTypeID("includeAncestors"),
@@ -189,7 +187,6 @@ actionDescriptor.putEnumerated(
     stringIDToTypeID("includeLayers"),
     stringIDToTypeID("includeVisible")
 );
-
 
 // NOTE: on the PS side, allowDither and useColorSettingsDither default to "true" if they are
 // not set at all. However, in Generator, the common case will be that we do NOT want to dither,
