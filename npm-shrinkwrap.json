@@ -28,6 +28,18 @@
       "version": "2.3.1",
       "from": "semver@~2.3",
       "resolved": "https://registry.npmjs.org/semver/-/semver-2.3.1.tgz"
+    },
+    "ws": {
+      "version": "0.4.31",
+      "from": "ws@git+https://github.com/adobe-photoshop/ws.git#v0.4.31-no-native",
+      "resolved": "git+https://github.com/adobe-photoshop/ws.git#f89590b37ef8ba322636e8ef8187252c06eec143",
+      "dependencies": {
+        "options": {
+          "version": "0.0.5",
+          "from": "options@0.0.5",
+          "resolved": "https://registry.npmjs.org/options/-/options-0.0.5.tgz"
+        }
+      }
     }
   }
 }
