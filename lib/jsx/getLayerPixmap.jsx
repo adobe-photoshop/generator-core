@@ -35,6 +35,12 @@
 //         (as opposed to scaling vectors, text, etc. in a smoother fashion.) In PS 15.0 and earlier
 //         pixel space scaling was the only option. So, setting this to "true" will replicate older behavior
 //         (Default: false)
+//   - clipToDocumentBounds: If true, crops returned pixels to the document bounds.
+//         By default, all pixels for the specified layers are returned, even if they lie outside the document
+//         bounds (e.g. if the document was cropped without "Delete Cropped Pixels" checked).
+//         Note that this option *cannot* be used with an inputRect/outputRect scaling. If inputRect/outputRect
+//         is set, this setting will be ignored and the pixels will not be cropped to document bounds.
+//         (Default: false)
 //   - compId: number, layer comp ID (optionally and exclusive of compIndex)
 //   - compIndex: number, layer comp index (optionally and exclusive of compId) 
 
@@ -194,6 +200,10 @@ actionDescriptor.putEnumerated(
 // the params properties).
 actionDescriptor.putBoolean(stringIDToTypeID("allowDither"), !!params.allowDither);
 actionDescriptor.putBoolean(stringIDToTypeID("useColorSettingsDither"), !!params.useColorSettingsDither);
+
+if (params.hasOwnProperty("clipToDocumentBounds")) {
+    actionDescriptor.putBoolean(stringIDToTypeID("clipToDocumentBounds"), !!params.clipToDocumentBounds);
+}
 
 if (params.boundsOnly) {
     actionDescriptor.putBoolean(stringIDToTypeID("boundsOnly"), params.boundsOnly);
