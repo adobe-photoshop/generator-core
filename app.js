@@ -38,7 +38,7 @@
     
     require("./lib/stdlog").setup({
         vendor:      "Adobe",
-        application: "Adobe Photoshop CC",
+        application: "Adobe Photoshop CC 2014",
         module:      "Generator"
     });
 
