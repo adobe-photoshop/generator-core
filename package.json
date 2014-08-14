@@ -17,7 +17,8 @@
     "optimist": "~0.6",
     "q": "~1.0",
     "semver": "~2.3",
-    "ws": "git+https://github.com/adobe-photoshop/ws.git#v0.4.31-no-native"
+    "ws": "git+https://github.com/adobe-photoshop/ws.git#v0.4.31-no-native",
+    "svgobjectmodelgenerator": "git+https://github.com/adobe-research/svgObjectModelGenerator.git#master"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
