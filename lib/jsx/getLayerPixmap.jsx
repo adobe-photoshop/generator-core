@@ -20,6 +20,10 @@
 //         means that stroke effects (e.g. rounded rect corners) are *not* scaled. (Default: false)
 //   - includeAncestorMasks: setting to "true" causes exported layer to be clipped by any ancestor
 //         masks that are visible (Default: false)
+//   - convertToWorkingRGBProfile: If true, performs a color conversion on the pixels
+//         before they are sent to generator. The color is converted to the working RGB profile (specified for
+//         the document in PS). By default (when this setting is false), the "raw" RGB data is sent, which is
+//         what is usually desired. (Default: false)
 //   - allowDither: controls whether any dithering could possibly happen in the color conversion
 //         to 8-bit RGB. If false, then dithering will definitely not occur, regardless of either
 //         the value of useColorSettingsDither and the color settings in Photoshop. (Default: false)
@@ -193,6 +197,10 @@ actionDescriptor.putEnumerated(
     stringIDToTypeID("includeLayers"),
     stringIDToTypeID("includeVisible")
 );
+
+if (params.hasOwnProperty("convertToWorkingRGBProfile")) {
+    actionDescriptor.putBoolean(stringIDToTypeID("convertToWorkingRGBProfile"), !!params.convertToWorkingRGBProfile);
+}
 
 // NOTE: on the PS side, allowDither and useColorSettingsDither default to "true" if they are
 // not set at all. However, in Generator, the common case will be that we do NOT want to dither,
