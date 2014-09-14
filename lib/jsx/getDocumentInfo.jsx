@@ -7,8 +7,11 @@
 //         layerInfo:            true,
 //         expandSmartObjects:   false,
 //         getTextStyles:        true,
+//	       getFullTextStyles:    false,
 //         selectedLayers:       true,  // Whether to only return information about the selected layers
-//         getCompLayerSettings: true   // Whether to return layer comp settings for each layer
+//         getCompLayerSettings: true,   // Whether to return layer comp settings for each layer
+//         getDefaultLayerFX:    false,
+//         getPathData:          false
 //     }
 // Optional params:
 //   - documentId: The ID of the document requested (leave null for current document)
