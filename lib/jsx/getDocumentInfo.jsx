@@ -7,7 +7,7 @@
 //         layerInfo:            true,
 //         expandSmartObjects:   false,
 //         getTextStyles:        true,
-//	       getFullTextStyles:    false,
+//         getFullTextStyles:    false,
 //         selectedLayers:       true,  // Whether to only return information about the selected layers
 //         getCompLayerSettings: true,   // Whether to return layer comp settings for each layer
 //         getDefaultLayerFX:    false,
