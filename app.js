@@ -52,7 +52,7 @@
 
     var optionParser = optimist["default"]({
         "p" : 49494,
-        "h" : "localhost",
+        "h" : "127.0.0.1",
         "P" : "password",
         "i" : null,
         "o" : null,
