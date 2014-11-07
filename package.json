@@ -1,6 +1,6 @@
 {
   "name": "generator-core",
-  "version": "3.3.0-dev",
+  "version": "3.4.0-dev",
   "photoshop-version": ">=15.0",
   "description": "Adobe Photoshop Generator Core",
   "main": "app.js",
