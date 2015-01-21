@@ -47,8 +47,7 @@
 //         (Default: false)
 //   - compId: number, layer comp ID (optionally and exclusive of compIndex)
 //   - compIndex: number, layer comp index (optionally and exclusive of compId) 
-
-var MAX_DIMENSION = 10000;
+//   - maxDimension: number, maximal dimension of pixmap in pixels
 
 var actionDescriptor = new ActionDescriptor(),
     transform;
@@ -130,8 +129,8 @@ if (transform) {
 }
 
 actionDescriptor.putInteger(stringIDToTypeID("documentID"), params.documentId);
-actionDescriptor.putInteger(stringIDToTypeID("width"), MAX_DIMENSION);
-actionDescriptor.putInteger(stringIDToTypeID("height"), MAX_DIMENSION);
+actionDescriptor.putInteger(stringIDToTypeID("width"), params.maxDimension);
+actionDescriptor.putInteger(stringIDToTypeID("height"), params.maxDimension);
 actionDescriptor.putInteger(stringIDToTypeID("format"), 2);
 
 if (typeof(params.layerSpec) === "object") {
