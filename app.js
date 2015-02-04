@@ -214,13 +214,13 @@
             options.password = argv.password;
         }
         
-        if(argv.photoshopVersion && typeof argv.photoshopVersion === "string") {
+        if (argv.photoshopVersion && typeof argv.photoshopVersion === "string") {
             options.photoshopVersion = argv.photoshopVersion;
         }
-        if(argv.photoshopPath && typeof argv.photoshopPath === "string") {
+        if (argv.photoshopPath && typeof argv.photoshopPath === "string") {
             options.photoshopPath = argv.photoshopPath;
         }
-        if(argv.photoshopBinaryPath && typeof argv.photoshopBinaryPath === "string") {
+        if (argv.photoshopBinaryPath && typeof argv.photoshopBinaryPath === "string") {
             options.photoshopBinaryPath = argv.photoshopBinaryPath;
         }
     
