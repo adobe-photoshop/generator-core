@@ -16,9 +16,8 @@
 /* exported runCopyCSSFromScript */
 
 // The built-in "app.path" is broken on the Mac, so we roll our own.
-function getPSAppPath()
-{
-    const kexecutablePathStr = stringIDToTypeID("executablePath");
+function getPSAppPath() {
+    var kexecutablePathStr = stringIDToTypeID("executablePath");
 
     var desc = new ActionDescriptor();
     var ref = new ActionReference();
@@ -90,7 +89,7 @@ svg.reset = function ()
                       ' xmlns="http://www.w3.org/2000/svg"',
                       ' xmlns:xlink="http://www.w3.org/1999/xlink"',
                       '>\n'].join('\n');
-	this.svgResult = "";
+    this.svgResult = "";
 };
 
 // Convert special characters to &#NN; form.  Note '\r' is
@@ -153,7 +152,7 @@ svg.setLayerSVGOffset = function(x,y)
 {
     this.Xoffset = x;
     this.Yoffset = y;
-    // The layer referenced doesn't actually matter; it just needs to 
+    // The layer referenced doesn't actually matter; it just needs to
     // reference *a* layer so it vectors into ULayerElement.
     var ref1 = new ActionReference();
     ref1.putIdentifier( classLayer, app.activeDocument.activeLayer.id );
@@ -210,7 +209,7 @@ svg.addOffsetPosition = function(boundsDesc)
 };
 
 // Definitions (such as linear gradients) must be collected and output ahead
-// of the rest of the SVG text.  
+// of the rest of the SVG text.
 svg.addDef = function (s)
 {
     this.svgDefs += s;
@@ -230,17 +229,20 @@ function SavedGradient(info, colorStops, url, minOpacity)
 
 SavedGradient.prototype.match = function (info, colorStops)
 {
-    if ((this.info === info) && (this.colorStops.length === colorStops.length))
+    // Note: you want to compare the members of the struct, hence == vs ===
+    /* jshint eqeqeq: false */
+    if ((this.info == info) && (this.colorStops.length === colorStops.length))
     {
         var i;
         for (i in colorStops) {
-            if (this.colorStops[i] !== colorStops[i]) {
+            if (this.colorStops[i] != colorStops[i]) {
                 return false;
             }
         }
         return true;
     }
     return false;
+    /* jshint eqeqeq: true */
 };
 
 // Collect gradient information
@@ -248,11 +250,11 @@ svg.getGradient = function (useLayerFX)
 {
     // "false" says those defined by layerFX are skipped.
     useLayerFX = (typeof useLayerFX === "undefined") ? false : useLayerFX;
-    
+
     var gradInfo = this.currentLayer.gradientInfo(useLayerFX);
     var colorStops = this.currentLayer.gradientColorStops();
     var gradientURL = null;
-    
+
     function addCoord(coord, v)
     {
         if (v < 0) {
@@ -272,7 +274,7 @@ svg.getGradient = function (useLayerFX)
                 return this.savedGradients[i].url;
             }
         }
-                
+
         // Otherwise, make a new URL and stash it for future reference
         gradientURL = "url(#PSgrad_" + this.gradientID + ")";
 
@@ -289,16 +291,16 @@ svg.getGradient = function (useLayerFX)
         this.addDef("<" + gradInfo.type + "Gradient " + 'id="PSgrad_' + this.gradientID + '"');
         if (gradInfo.type === "linear")
         {
-            // SVG wants the angle in cartesian, not polar, coords. 
+            // SVG wants the angle in cartesian, not polar, coords.
             var angle = stripUnits(gradInfo.angle) * Math.PI / 180.0;
             var xa = Math.cos(angle) * 100, ya = -Math.sin(angle) * 100;
             addCoord("x", round1k(xa));
             addCoord("y", round1k(ya));
         }
         this.addDef('>\n');
-        
+
         // reverse is applied only to color values, not stop locations
-        
+
         if (gradInfo.reverse) {
             colorStops = GradientStop.reverseStoplist(colorStops);
         }
@@ -319,7 +321,7 @@ svg.getGradient = function (useLayerFX)
 svg.addGradientOverlay = function ()
 {
     var gradOverlay = this.getLayerAttr("layerEffects.gradientFill");
-    
+
     if (gradOverlay && this.getLayerAttr("layerFXVisible") && gradOverlay.getVal("enabled")) {
         return this.getGradient(true);  // Explictly ask for layerFX gradient
     }
@@ -392,12 +394,12 @@ svg.addColorOverlay = function ()
         if (! params.mode) {
             return;         // Bail on unsupported transfer modes
         }
-            
+
         var filterStr =
 '<filter id="$filterTag$">\
-  <feFlood $color$ flood-opacity="$opacity$" result="floodOut" />\
-  <feComposite operator="atop" in="floodOut" in2="SourceGraphic" result="compOut" />\
-  <feBlend mode="$mode$" in="compOut" in2="SourceGraphic" />\
+    <feFlood $color$ flood-opacity="$opacity$" result="floodOut" />\
+    <feComposite operator="atop" in="floodOut" in2="SourceGraphic" result="compOut" />\
+    <feBlend mode="$mode$" in="compOut" in2="SourceGraphic" />\
 </filter>\n';
         this.replaceFilterKeys(filterStr, params);
     }
@@ -415,23 +417,23 @@ svg.addInnerShadow = function ()
         }
 
         var offset = PSLayerInfo.getEffectOffset(inshDesc);
-        
+
         var params = { filterTag: "Filter_" + this.filterID++,
                        dx: stripUnits(offset[0]), dy: stripUnits(offset[1]),
                        blurDist: round1k(Math.sqrt(stripUnits(inshDesc.getVal("blur")))),
                        inshColor: this.currentLayer.replaceDescKey('flood-color="$color$"', inshDesc)[1],
                        opacity: round1k(stripUnits(inshDesc.getVal("opacity")) / 100.0),
                        mode: mode };
-        
+
         var filterStr =
 '<filter id="$filterTag$">\
-  <feOffset in="SourceAlpha" dx="$dx$" dy="$dy$" />\
-  <feGaussianBlur result="blurOut" stdDeviation="$blurDist$" />\
-  <feFlood $inshColor$ result="floodOut" />\
-  <feComposite operator="out" in="floodOut" in2="blurOut" result="compOut" />\
-  <feComposite operator="in" in="compOut" in2="SourceAlpha" />\
-  <feComponentTransfer><feFuncA type="linear" slope="$opacity$"/></feComponentTransfer>\
-  <feBlend mode="$mode$" in2="SourceGraphic" />\
+    <feOffset in="SourceAlpha" dx="$dx$" dy="$dy$" />\
+    <feGaussianBlur result="blurOut" stdDeviation="$blurDist$" />\
+    <feFlood $inshColor$ result="floodOut" />\
+    <feComposite operator="out" in="floodOut" in2="blurOut" result="compOut" />\
+    <feComposite operator="in" in="compOut" in2="SourceAlpha" />\
+    <feComponentTransfer><feFuncA type="linear" slope="$opacity$"/></feComponentTransfer>\
+    <feBlend mode="$mode$" in2="SourceGraphic" />\
 </filter>\n';
         this.replaceFilterKeys(filterStr, params);
     }
@@ -453,6 +455,8 @@ svg.addDropShadow = function ()
     var dsInfo = this.currentLayer.getDropShadowInfo();
     if (dsInfo)
     {
+        dsInfo = dsInfo[0]; // Only take the first of the list
+        var dsDesc = dsInfo.dsDesc;
         var strokeWidth = 0;
         var agmDesc = this.currentLayer.getLayerAttr("AGMStrokeStyleInfo");
         if (agmDesc && agmDesc.getVal("strokeEnabled")
@@ -471,21 +475,21 @@ svg.addDropShadow = function ()
                        fxHeight: 'height="' + (fxBounds[3] - fxBounds[1] + strokeWidth*2) + 'px"',
                        dx: stripUnits(dsInfo.xoff), dy: stripUnits(dsInfo.yoff),
                        // SVG uses "standard deviation" vs. pixels for the blur distance; sqrt is a rough approximation
-                       blurDist: round1k(Math.sqrt(stripUnits(dsInfo.dsDesc.getVal("blur")))),
-                       dsColor: this.currentLayer.replaceDescKey('flood-color="$color$"', dsInfo.dsDesc)[1],
-                       opacity: round1k(stripUnits(dsInfo.dsDesc.getVal("opacity")) / 100.0) };
+                       blurDist: round1k(Math.sqrt(stripUnits(dsDesc.getVal("blur")))),
+                       dsColor: this.currentLayer.replaceDescKey('flood-color="$color$"', dsDesc)[1],
+                       opacity: round1k(stripUnits(dsDesc.getVal("opacity")) / 100.0) };
 
         // By default, the filter extends 10% beyond the bounds of the object.
-        // x, y, width, height need to specify the entire affected region; 
+        // x, y, width, height need to specify the entire affected region;
         // "userSpaceOnUse" hard codes it to the object's coords
         var filterDef =
 '<filter filterUnits="userSpaceOnUse" id="$filterTag$" $xoffset$ $yoffset$ $fxWidth$ $fxHeight$  >\
-  <feOffset in="SourceAlpha" dx="$dx$" dy="$dy$" />\
-  <feGaussianBlur result="blurOut" stdDeviation="$blurDist$" />\
-  <feFlood $dsColor$ result="floodOut" />\
-  <feComposite operator="atop" in="floodOut" in2="blurOut" />\
-  <feComponentTransfer><feFuncA type="linear" slope="$opacity$"/></feComponentTransfer>\
-  <feMerge>\n    <feMergeNode/>\n    <feMergeNode in="SourceGraphic"/>\n  </feMerge>\
+    <feOffset in="SourceAlpha" dx="$dx$" dy="$dy$" />\
+    <feGaussianBlur result="blurOut" stdDeviation="$blurDist$" />\
+    <feFlood $dsColor$ result="floodOut" />\
+    <feComposite operator="atop" in="floodOut" in2="blurOut" />\
+    <feComponentTransfer><feFuncA type="linear" slope="$opacity$"/></feComponentTransfer>\
+    <feMerge>\n    <feMergeNode/>\n    <feMergeNode in="SourceGraphic"/>\n  </feMerge>\
 </filter>\n';
         this.replaceFilterKeys(filterDef, params);
     }
@@ -513,7 +517,7 @@ svg.addOpacity = function (combine)
         fillOpacity = this.getLayerAttr("layerEffects.solidFill.opacity");
     }
     var opacity = this.getLayerAttr("opacity") / 255;
-    
+
     if (combine)
     {
         opacity *= fillOpacity;
@@ -535,7 +539,7 @@ svg.addOpacity = function (combine)
 //
 // Add an attribute to the SVG output.  Note items delimited
 // in $'s are substituted with values looked up from the layer data
-// e.g.: 
+// e.g.:
 //     border-width: $AGMStrokeStyleInfo.strokeStyleLineWidth$;"
 // puts the stroke width into the output.  If the descriptor in the $'s
 // isn't found, no output is added.
@@ -545,7 +549,7 @@ svg.addAttribute = function (attrText, baseDesc)
     var result = this.currentLayer.replaceDescKey(attrText, baseDesc);
     var replacementFailed = result[0];
     attrText = result[1];
-    
+
     if (! replacementFailed) {
         this.addText(attrText);
     }
@@ -581,11 +585,11 @@ svg.getShapeLayerSVG = function ()
                    "strokeStyleSquareCap": 'square'};
     var joinDict = {"strokeStyleBevelJoin": 'bevel', "strokeStyleRoundJoin": 'round',
                     "strokeStyleMiterJoin": 'miter'};
-                    
+
     function hasStroke() {
         return (agmDesc && agmDesc.getVal("strokeEnabled"));
     }
-                    
+
     function addStroke() {
         if (hasStroke())
         {
@@ -609,7 +613,7 @@ svg.getShapeLayerSVG = function ()
                 }
                 svg.addParam('stroke-dasharray', dashes.join(", "));
             }
-            
+
             var cap = agmDesc.getVal("strokeStyleLineCapType");
             if (cap) {
                 svg.addParam('stroke-linecap', capDict[cap]);
@@ -637,7 +641,7 @@ svg.getShapeLayerSVG = function ()
 
     // For now, Everything Is A Path.  We'll revisit this when shape meta-data is available.
     this.addText("<path fill-rule=\"evenodd\" ");
-    
+
     // If there's a gradient overlay effect, the stroke must be added there.
     if (! gradOverlayID) {
         addStroke();
@@ -663,7 +667,7 @@ svg.getShapeLayerSVG = function ()
     this.addText('/>\n');
 
     this.popFXGroups();
-    
+
     if (gradOverlayID)
     {
         this.addText("<path");
@@ -672,7 +676,7 @@ svg.getShapeLayerSVG = function ()
         this.addText('\n d="' + this.getLayerAttr("layerVectorPointData") + '"');
         this.addText('/>\n');
     }
-    
+
     // A solid fill layerFX trashes the stroke, so we over-write it with one outside of the solidFill layer effect group
     if (!gradOverlayID && this.getLayerAttr("layerEffects.solidFill.enabled") && hasStroke())
     {
@@ -712,7 +716,7 @@ svg.getAdjustmentLayerSVG = function ()
     this.addText("/>\n");
 
     this.popFXGroups();
-    
+
     if (gradOverlayID)
     {
         addRect();  // Add another rect with the gradient overlay FX
@@ -727,7 +731,7 @@ svg.getAdjustmentLayerSVG = function ()
 svg.getTextLayerSVG = function ()
 {
     var gradientURL = this.getGradient(true);
-    
+
     if (gradientURL)
     {
         var minOpacity = this.gradientDict[gradientURL].minOpacity;
@@ -779,9 +783,9 @@ svg.getTextLayerSVG1 = function (fillColor)
         }
         this.addOpacity();
 
-		// "boundsDesc" is the bounding box of the transformed text (in doc coords)
-		// Original (untransformed, untranslated) text bounding box
-		var originalTextBounds = this.getLayerAttr("textKey.boundingBox");
+        // "boundsDesc" is the bounding box of the transformed text (in doc coords)
+        // Original (untransformed, untranslated) text bounding box
+        var originalTextBounds = this.getLayerAttr("textKey.boundingBox");
 
         var transformMatrixUsed = false;
         var textXform = this.getLayerAttr("textKey.transform");
@@ -791,7 +795,7 @@ svg.getTextLayerSVG1 = function (fillColor)
             xfm = function (key) { return textXform.getVal(key); };
             var xx = xfm("xx"), xy = xfm("xy"), yx = xfm("yx"),
                 yy = xfm("yy"), tx = xfm("tx"), ty = xfm("ty");
-            
+
             // Check to make sure it's not an identity matrix
             if (! ((xx === 1) && (xy === 0) && (yx === 0)
                 && (yy === 1) && (tx === 0) && (ty === 0)))
@@ -844,8 +848,8 @@ svg.getTextLayerSVG1 = function (fillColor)
                 isBoxText = true;
                 textBottom = stripUnits(boundsDesc.getVal("bottom")) - stripUnits(boundsDesc.getVal("top"));
                 if (lineBreaks) {
-                    textBottom -= stripUnits(this.getLayerAttr("textKey.bounds.bottom")) 
-                                 - stripUnits(originalTextBounds.getVal("bottom"));
+                    textBottom -= stripUnits(this.getLayerAttr("textKey.bounds.bottom"))
+                                - stripUnits(originalTextBounds.getVal("bottom"));
                 }
                 else {
                     textBottom += stripUnits(this.getLayerAttr("textKey.bounds.top"));
@@ -874,7 +878,7 @@ svg.getTextLayerSVG1 = function (fillColor)
                           // These should probably also modify the font size?
                           ["baseline",          "superScript",      ' baseline-shift="super"']
                           //["baseline",          "subScript",        ' baseline-shift="sub"']
-                         ];
+                        ];
 
         var i;
         for (i in styleTable) {
@@ -882,7 +886,7 @@ svg.getTextLayerSVG1 = function (fillColor)
                 this.addText(styleTable[i][2]);
             }
         }
-                
+
         var fontSize = stripUnits(this.getVal2("size", textDescList));
         var fontLeading = textDesc.getVal("leading");
         fontLeading = fontLeading ? stripUnits(fontLeading) : fontSize * 1.2;
@@ -910,7 +914,7 @@ svg.getTextLayerSVG1 = function (fillColor)
                 // Strip off the units; this keeps it as a relative measure.
                 lineHeight = round1k(fontLeading / fontSize);
             }
-        
+
             var topOffset = "";
             if (! transformMatrixUsed) {
                 if (isBoxText) {
@@ -942,11 +946,11 @@ svg.getTextLayerSVG1 = function (fillColor)
 svg.getImageLayerFileRefSVG = function ()
 {
     var validSuffix = {'.tiff': 1, '.png': 1, '.jpg': 1, '.gif': 1};
-    
-    // Apply generator's naming rules to the image names.  
+
+    // Apply generator's naming rules to the image names.
     // If there's a list, just grab the first.
     var name = this.getLayerAttr("name").split(",")[0];
-    
+
     var suffix = (name.lastIndexOf('.') >= 0)
                     ? name.slice(name.lastIndexOf('.')).toLowerCase() : null;
     suffix = (validSuffix[suffix]) ? suffix : null;
@@ -961,11 +965,11 @@ svg.getImageLayerFileRefSVG = function ()
 svg.getImageLayerSVG = function ()
 {
     var boundsDesc = this.currentLayer.getLayerAttr("bounds");
-    
+
     this.addText("<image ");
 
     this.addOpacity(true);
-    
+
     this.addOffsetPosition(boundsDesc);
     this.addAttribute(' width="$width$" height="$height$" ', boundsDesc);
 
@@ -1085,7 +1089,7 @@ svg.popUnits = function ()
 // Find the actual bounds of all the items, including strokes
 svg.findActualBounds = function ()
 {
-    
+
     var i, layers = [];
     if (this.currentLayer.layerKind === kLayerGroupSheet) {
         layers = this.walkLayerGroup();
@@ -1099,7 +1103,7 @@ svg.findActualBounds = function ()
     // wind up as symbols, not the # they evaluate too.  See CopyCSSToClipboard.jsx
     // for the definitions.
     var contentLayerKinds = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 };
-    
+
     for (i = 0; i < layers.length; ++i)
     {
         if ((typeof layers[i] !== "number")
@@ -1128,7 +1132,7 @@ svg.findActualBounds = function ()
                 layerBounds[2] += strokeWidth;
                 layerBounds[3] += strokeWidth;
             }
-        
+
             if (bounds === null) {
                 bounds = layerBounds;
             }
@@ -1150,7 +1154,7 @@ svg.createSVGText = function ()
     // Fixing the SVG bounds requires being able to stop Generator's tracking,
     // which is only available in PS v15 (CC 2014) and up.
     var fixBoundsAvailable = Number(app.version.match(/\d+/)) >= 15;
-    
+
     var bounds, savedLayer, curLayer = PSLayerInfo.layerIDToIndex(params.layerId);
     this.setCurrentLayer(curLayer);
 
@@ -1164,7 +1168,7 @@ svg.createSVGText = function ()
         // only the active (target) layer can be translated
         svg.setLayerSVGOffset(-bounds[0].as('px'), -bounds[1].as('px'));
     }
-    
+
     svg.processLayer(curLayer);
     svg.popUnits();
     var svgResult = this.svgHeader;
@@ -1181,7 +1185,7 @@ svg.createSVGText = function ()
 
         app.activeDocument.activeLayer = savedLayer;
     }
-       
+
     if (svg.svgDefs.length > 0) {
         svgResult += "<defs>\n" + svg.svgDefs + "\n</defs>\n";
     }
