@@ -230,6 +230,7 @@ function SavedGradient(info, colorStops, url, minOpacity)
 SavedGradient.prototype.match = function (info, colorStops)
 {
     // Note: you want to compare the members of the struct, hence == vs ===
+    // (info and stops have ExtendScript "==" overrides)
     /* jshint eqeqeq: false */
     if ((this.info == info) && (this.colorStops.length === colorStops.length))
     {
