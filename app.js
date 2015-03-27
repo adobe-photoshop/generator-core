@@ -56,7 +56,10 @@
         "P" : "password",
         "i" : null,
         "o" : null,
-        "f" : null
+        "f" : null,
+        "photoshopVersion": null,
+        "photoshopPath": null,
+        "photoshopBinaryPath": null
     });
     
     var argv = optionParser
@@ -68,6 +71,9 @@
             "i": "file descriptor of input pipe",
             "o": "file descriptor of output pipe",
             "f": "folder to search for plugins (can be used multiple times)",
+            "photoshopVersion": "tell Generator PS's version so it isn't queried at startup (optional)",
+            "photoshopPath": "tell Generator PS's path so it isn't queried at startup (optional)",
+            "photoshopBinaryPath": "tell Generator PS's binary location so it isn't queried at startup (optional)",
             "help": "display help message"
         }).alias({
             "p": "port",
@@ -214,6 +220,16 @@
             options.password = argv.password;
         }
         
+        if (argv.photoshopVersion && typeof argv.photoshopVersion === "string") {
+            options.photoshopVersion = argv.photoshopVersion;
+        }
+        if (argv.photoshopPath && typeof argv.photoshopPath === "string") {
+            options.photoshopPath = argv.photoshopPath;
+        }
+        if (argv.photoshopBinaryPath && typeof argv.photoshopBinaryPath === "string") {
+            options.photoshopBinaryPath = argv.photoshopBinaryPath;
+        }
+    
         options.config = config;
 
         theGenerator.start(options).done(
@@ -284,8 +300,7 @@
         setupGenerator().fail(
             function (err) {
                 stop(-3, "Generator failed to initialize: " + err);
-            }
-        );
+            });
     }
 
     process.on("uncaughtException", function (err) {
