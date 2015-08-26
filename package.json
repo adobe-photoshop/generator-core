@@ -1,6 +1,7 @@
 {
   "name": "generator-core",
-  "version": "2.0.3-dev",
+  "version": "3.5.0",
+  "photoshop-version": ">=15.0",
   "description": "Adobe Photoshop Generator Core",
   "main": "app.js",
   "repository": {
@@ -15,12 +16,15 @@
   "dependencies": {
     "optimist": "~0.6",
     "q": "~1.0",
-    "semver": "~2.2"
+    "semver": "~2.3",
+    "ws": "git+https://github.com/adobe-photoshop/ws.git#v0.4.31-no-native"
   },
   "devDependencies": {
-    "grunt": "~0.4",
-    "grunt-contrib-jshint": "~0.8",
+    "grunt": "~0.4.5",
+    "grunt-contrib-jshint": "~0.10",
+    "grunt-contrib-nodeunit": "~0.3",
+    "grunt-jscs": "~0.6.1",
     "nodeunit": "~0.8",
-    "grunt-contrib-nodeunit": "~0.3"
+    "jscs-trailing-whitespace-in-source": "0.0.1"
   }
 }

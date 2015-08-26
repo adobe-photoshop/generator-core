@@ -1,18 +1,24 @@
 ## Generator Core [![Build Status](https://travis-ci.org/adobe-photoshop/generator-core.png?branch=master)](https://travis-ci.org/adobe-photoshop/generator-core)
 
-Generator is a JavaScript-based extensibility technology which recently shipped in Adobe Photoshop CC v14.1. This repository contains Generator Core, a Node.js library that handles communication between Photoshop and Generator Plug-ins.
+Generator is a JavaScript-based extensibility technology which first shipped in Adobe Photoshop CC v14.1. This repository contains Generator Core, a Node.js library that handles communication between Photoshop and Generator Plug-ins.
 
 ### Status
 
 Generator Core is under active development. Thorough documentation, example plug-ins, and tutorials are coming soon. In the mean time, please refer to these resources:
 
+* [Generator Architecture](https://github.com/adobe-photoshop/generator-core/wiki/Generator-Architecture) -- A wiki page that describes the current overall architecture of Generator.
+* [Generator API Changes](https://github.com/adobe-photoshop/generator-core/wiki/API-Changes) -- A wiki page that describes changes and additions to the Generator Core API over time. 
 * [Image Asset Generation Plug-in](https://github.com/adobe-photoshop/generator-assets) -- A Generator Plug-in that helps users export image assets from their Photoshop files.
-* [Generator Architecture](https://github.com/adobe-photoshop/generator-core/wiki/Generator-Architecture) -- A wiki page describing the current overall architecture of Generator.
+* [List of (known) Generator Plug-ins](https://github.com/adobe-photoshop/generator-core/wiki/Generator-Plug-ins)
 
 ### Developing Generator Plug-ins
 
-* Tom Krcha's [Script Your First Adobe Generator Plugin For Photoshop](http://tomkrcha.com/?p=3896)
-* Tom Krcha's [Sample Plug-in](https://github.com/tomkrcha/generator-getting-started/)
+* Learn how to [setup the Generator development environment](https://github.com/adobe-photoshop/generator-core/wiki/Generator-Development-Environment-Setup)
+* Script your [first Adobe Generator plugin for Photoshop](http://tomkrcha.com/?p=3896)
+* Experiment with a [sample plug-in](https://github.com/adobe-photoshop/generator-getting-started/)
+* Get your Generator development questions answered at the [Adobe-Generator-Dev Google group](https://groups.google.com/forum/#!forum/adobe-generator-dev)
+* Follow [@AdobeGenerator](https://twitter.com/AdobeGenerator) on Twitter for more updates
+* We :heart: pull requests! If you submit one, please also sign our [Contributor License Agreement](https://secure.echosign.com/public/hostedForm?formid=8IWLQL2I3V7F6R)
 
 ### License
 

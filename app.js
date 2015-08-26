@@ -38,7 +38,7 @@
     
     require("./lib/stdlog").setup({
         vendor:      "Adobe",
-        application: "Adobe Photoshop CC",
+        application: "Adobe Photoshop CC 2015",
         module:      "Generator"
     });
 
@@ -51,37 +51,37 @@
 
 
     var optionParser = optimist["default"]({
-        "r" : "independent",
-        "m" : null,
         "p" : 49494,
-        "h" : "localhost",
+        "h" : "127.0.0.1",
         "P" : "password",
         "i" : null,
         "o" : null,
         "f" : null,
+        "photoshopVersion": null,
+        "photoshopPath": null,
+        "photoshopBinaryPath": null
     });
     
     var argv = optionParser
         .usage("Run generator service.\nUsage: $0")
         .describe({
-            "r": "launch reason, one of: independent, menu, metadata, alwayson",
-            "m": "menu ID of action that should be executed immediately after startup",
             "p": "Photoshop server port",
             "h": "Photoshop server host",
             "P": "Photoshop server password",
             "i": "file descriptor of input pipe",
             "o": "file descriptor of output pipe",
             "f": "folder to search for plugins (can be used multiple times)",
+            "photoshopVersion": "tell Generator PS's version so it isn't queried at startup (optional)",
+            "photoshopPath": "tell Generator PS's path so it isn't queried at startup (optional)",
+            "photoshopBinaryPath": "tell Generator PS's binary location so it isn't queried at startup (optional)",
             "help": "display help message"
         }).alias({
-            "r": "launchreason",
-            "m": "menu",
             "p": "port",
             "h": "host",
             "P": "password",
             "i": "input",
             "o": "output",
-            "f": "pluginfolder",
+            "f": "pluginfolder"
         }).argv;
     
     if (argv.help) {
@@ -220,6 +220,16 @@
             options.password = argv.password;
         }
         
+        if (argv.photoshopVersion && typeof argv.photoshopVersion === "string") {
+            options.photoshopVersion = argv.photoshopVersion;
+        }
+        if (argv.photoshopPath && typeof argv.photoshopPath === "string") {
+            options.photoshopPath = argv.photoshopPath;
+        }
+        if (argv.photoshopBinaryPath && typeof argv.photoshopBinaryPath === "string") {
+            options.photoshopBinaryPath = argv.photoshopBinaryPath;
+        }
+    
         options.config = config;
 
         theGenerator.start(options).done(
@@ -290,8 +300,7 @@
         setupGenerator().fail(
             function (err) {
                 stop(-3, "Generator failed to initialize: " + err);
-            }
-        );
+            });
     }
 
     process.on("uncaughtException", function (err) {
