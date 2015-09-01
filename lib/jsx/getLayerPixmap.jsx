@@ -24,6 +24,8 @@
 //         before they are sent to generator. The color is converted to the working RGB profile (specified for
 //         the document in PS). By default (when this setting is false), the "raw" RGB data is sent, which is
 //         what is usually desired. (Default: false)
+//   - useICCProfile: String with the ICC color profile to use. If set this overrides
+//         the convertToWorkingRGBProfile flag. A common value is "sRGB IEC61966-2.1". (Default: "")
 //   - allowDither: controls whether any dithering could possibly happen in the color conversion
 //         to 8-bit RGB. If false, then dithering will definitely not occur, regardless of either
 //         the value of useColorSettingsDither and the color settings in Photoshop. (Default: false)
@@ -201,6 +203,10 @@ actionDescriptor.putEnumerated(
 
 if (params.hasOwnProperty("convertToWorkingRGBProfile")) {
     actionDescriptor.putBoolean(stringIDToTypeID("convertToWorkingRGBProfile"), !!params.convertToWorkingRGBProfile);
+}
+
+if (params.hasOwnProperty("useICCProfile")) {
+    actionDescriptor.putString(stringIDToTypeID("useICCProfile"), String(params.useICCProfile));
 }
 
 // NOTE: on the PS side, allowDither and useColorSettingsDither default to "true" if they are
