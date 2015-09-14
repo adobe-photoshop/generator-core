@@ -224,5 +224,8 @@ if (params.boundsOnly) {
     actionDescriptor.putBoolean(stringIDToTypeID("boundsOnly"), params.boundsOnly);
 }
 actionDescriptor.putBoolean(stringIDToTypeID("bounds"), params.bounds);
+if (params.hasOwnProperty("thread")) {
+    actionDescriptor.putBoolean(stringIDToTypeID("thread"), !!params.thread);
+}
 
 executeAction(stringIDToTypeID("sendLayerThumbnailToNetworkClient"), actionDescriptor, DialogModes.NO);
