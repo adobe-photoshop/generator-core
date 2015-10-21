@@ -252,7 +252,7 @@
                 // keyed on plugin name
 
                 plugins.forEach(function (p) {
-                    if(shouldWhiteList && whiteListedPlugins.indexOf(p.metadata.name) == -1) {
+                    if(shouldWhiteList && whiteListedPlugins.indexOf(p.metadata.name) === -1) {
                         //if we are in "whitelist mode" skip any plugins that are not in the array
                         return;
                     }
