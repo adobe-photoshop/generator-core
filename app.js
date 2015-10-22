@@ -59,7 +59,8 @@
         "f" : null,
         "photoshopVersion": null,
         "photoshopPath": null,
-        "photoshopBinaryPath": null
+        "photoshopBinaryPath": null,
+        "whiteListedPlugins": null
     });
     
     var argv = optionParser
@@ -74,6 +75,7 @@
             "photoshopVersion": "tell Generator PS's version so it isn't queried at startup (optional)",
             "photoshopPath": "tell Generator PS's path so it isn't queried at startup (optional)",
             "photoshopBinaryPath": "tell Generator PS's binary location so it isn't queried at startup (optional)",
+            "whiteListedPlugins": "A comma seperated list of plugin names that are ok to run (optional)",
             "help": "display help message"
         }).alias({
             "p": "port",
@@ -237,11 +239,23 @@
                 var semver = require("semver"),
                     totalPluginCount = 0,
                     pluginMap = {},
-                    plugins = scanPluginDirectories(argv.pluginfolder, theGenerator);
+                    plugins = scanPluginDirectories(argv.pluginfolder, theGenerator),
+                    shouldWhiteList = typeof argv.whiteListedPlugins === "string",
+                    whiteListedPlugins;
+
+                if (shouldWhiteList) {
+                    whiteListedPlugins = argv.whiteListedPlugins.split(",").map(function (s) { return s.trim(); });
+                }
+
 
                 // Ensure all plugins have a valid semver, then put them in to a map
                 // keyed on plugin name
+
                 plugins.forEach(function (p) {
+                    if (shouldWhiteList && whiteListedPlugins.indexOf(p.metadata.name) === -1) {
+                        //if we are in "whitelist mode" skip any plugins that are not in the array
+                        return;
+                    }
                     if (!semver.valid(p.metadata.version)) {
                         p.metadata.version = "0.0.0";
                     }
