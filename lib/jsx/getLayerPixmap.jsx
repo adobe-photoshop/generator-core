@@ -26,6 +26,8 @@
 //         what is usually desired. (Default: false)
 //   - useICCProfile: String with the ICC color profile to use. If set this overrides
 //         the convertToWorkingRGBProfile flag. A common value is "sRGB IEC61966-2.1". (Default: "")
+//   - getICCProfileData: If true then the final ICC profile for the image is included 
+//         along with the returned pixamp (added after PS 16.1)
 //   - allowDither: controls whether any dithering could possibly happen in the color conversion
 //         to 8-bit RGB. If false, then dithering will definitely not occur, regardless of either
 //         the value of useColorSettingsDither and the color settings in Photoshop. (Default: false)
@@ -207,6 +209,10 @@ if (params.hasOwnProperty("convertToWorkingRGBProfile")) {
 
 if (params.hasOwnProperty("useICCProfile")) {
     actionDescriptor.putString(stringIDToTypeID("useICCProfile"), String(params.useICCProfile));
+}
+
+if (params.hasOwnProperty("getICCProfileData")) {
+    actionDescriptor.putBoolean(stringIDToTypeID("sendThumbnailProfile"), !!params.getICCProfileData);
 }
 
 // NOTE: on the PS side, allowDither and useColorSettingsDither default to "true" if they are
