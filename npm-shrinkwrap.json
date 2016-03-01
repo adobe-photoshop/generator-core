@@ -25,9 +25,9 @@
       "resolved": "https://registry.npmjs.org/q/-/q-1.0.1.tgz"
     },
     "semver": {
-      "version": "2.3.2",
-      "from": "semver@2.3.2",
-      "resolved": "https://registry.npmjs.org/semver/-/semver-2.3.2.tgz"
+      "version": "5.1.0",
+      "from": "semver@latest",
+      "resolved": "https://registry.npmjs.org/semver/-/semver-5.1.0.tgz"
     },
     "ws": {
       "version": "1.0.1",
