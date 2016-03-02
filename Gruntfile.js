@@ -63,6 +63,11 @@ module.exports = function (grunt) {
         
         nodeunit : {
             all : ["test/test-*.js"]
+        },
+
+        nsp: {
+            package: grunt.file.readJSON("package.json"),
+            shrinkwrap: grunt.file.readJSON("npm-shrinkwrap.json")
         }
 
     });
@@ -70,8 +75,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-jshint");
     grunt.loadNpmTasks("grunt-jscs");
     grunt.loadNpmTasks("grunt-contrib-nodeunit");
+    grunt.loadNpmTasks("grunt-nsp");
 
-    grunt.registerTask("test", ["jshint", "jscs", "nodeunit"]);
+    grunt.registerTask("test", ["jshint", "jscs", "nodeunit", "nsp"]);
 
     grunt.registerTask("default", ["test"]);
 

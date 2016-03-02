@@ -16,15 +16,16 @@
   "dependencies": {
     "optimist": "~0.6",
     "q": "~1.0",
-    "semver": "~2.3",
-    "ws": "git+https://github.com/adobe-photoshop/ws.git#v0.4.31-no-native"
+    "semver": "^5.1.0",
+    "ws": "^1.0.1"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-contrib-jshint": "~0.10",
     "grunt-contrib-nodeunit": "~0.3",
     "grunt-jscs": "~0.6.1",
-    "nodeunit": "~0.8",
-    "jscs-trailing-whitespace-in-source": "0.0.1"
+    "grunt-nsp": "^2.1.2",
+    "jscs-trailing-whitespace-in-source": "0.0.1",
+    "nodeunit": "~0.8"
   }
 }
