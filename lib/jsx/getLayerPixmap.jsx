@@ -49,6 +49,7 @@
 //         Note that this option *cannot* be used with an inputRect/outputRect scaling. If inputRect/outputRect
 //         is set, this setting will be ignored and the pixels will not be cropped to document bounds.
 //         (Default: false)
+//   - clipBounds: if present crops retuned pixels to the given bounds
 //   - compId: number, layer comp ID (optionally and exclusive of compIndex)
 //   - compIndex: number, layer comp index (optionally and exclusive of compId) 
 //   - maxDimension: number, maximal dimension of pixmap in pixels
@@ -103,8 +104,8 @@ if (params.inputRect && params.outputRect) {
         transform.putBoolean(stringIDToTypeID("forceDumbScaling"), true);
     }
 
-    transform.putDouble(stringIDToTypeID("width"), params.scaleX * 100);
-    transform.putDouble(stringIDToTypeID("height"), params.scaleY * 100);
+    transform.putDouble(charIDToTypeID("Wdth"), params.scaleX * 100);
+    transform.putDouble(charIDToTypeID("Hght"), params.scaleY * 100);
 }
 
 if (transform) {
@@ -224,6 +225,21 @@ actionDescriptor.putBoolean(stringIDToTypeID("useColorSettingsDither"), !!params
 
 if (params.hasOwnProperty("clipToDocumentBounds")) {
     actionDescriptor.putBoolean(stringIDToTypeID("clipToDocumentBounds"), !!params.clipToDocumentBounds);
+}
+
+if (params.clipBounds) {
+
+    // The part of the document to use
+    var clipBounds = params.clipBounds,
+        psClipRect = new ActionDescriptor();
+
+    psClipRect.putUnitDouble(stringIDToTypeID("left"), charIDToTypeID("#Pxl"), clipBounds.left);
+    psClipRect.putUnitDouble(stringIDToTypeID("top"), charIDToTypeID("#Pxl"), clipBounds.top);
+    
+    psClipRect.putUnitDouble(stringIDToTypeID("right"), charIDToTypeID("#Pxl"), clipBounds.right);
+    psClipRect.putUnitDouble(stringIDToTypeID("bottom"), charIDToTypeID("#Pxl"), clipBounds.bottom);
+
+    actionDescriptor.putObject(stringIDToTypeID("clipBounds"), stringIDToTypeID("clipBounds"), psClipRect);
 }
 
 if (params.boundsOnly) {
