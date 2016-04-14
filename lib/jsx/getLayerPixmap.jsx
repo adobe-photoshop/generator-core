@@ -49,7 +49,8 @@
 //         Note that this option *cannot* be used with an inputRect/outputRect scaling. If inputRect/outputRect
 //         is set, this setting will be ignored and the pixels will not be cropped to document bounds.
 //         (Default: false)
-//   - clipBounds: if present crops retuned pixels to the given bounds
+//   - clipBounds: crops retuned pixels to the given bounds
+//   - usePSClipping: if present use clipBounds to clip image
 //   - compId: number, layer comp ID (optionally and exclusive of compIndex)
 //   - compIndex: number, layer comp index (optionally and exclusive of compId) 
 //   - maxDimension: number, maximal dimension of pixmap in pixels
@@ -227,7 +228,7 @@ if (params.hasOwnProperty("clipToDocumentBounds")) {
     actionDescriptor.putBoolean(stringIDToTypeID("clipToDocumentBounds"), !!params.clipToDocumentBounds);
 }
 
-if (params.clipBounds) {
+if (params.clipBounds && params.usePSClipping) {
 
     // The part of the document to use
     var clipBounds = params.clipBounds,
