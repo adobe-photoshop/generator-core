@@ -24,7 +24,13 @@
 (function () {
     "use strict";
 
-    var utils = require("./lib/utils");
+    var util = require("util"),
+        optimist = require("optimist"),
+        Q = require("q"),
+        config = require("./lib/config").getConfig(),
+        generator = require("./lib/generator"),
+        stdlog = require("./lib/stdlog"),
+        utils = require("./lib/utils");
 
     var PLUGIN_KEY_PREFIX = "PLUGIN-";
 
@@ -36,20 +42,6 @@
         utils.filterWriteStream(process.stderr, utils.replaceBullet);
     }
     
-    require("./lib/stdlog").setup({
-        vendor:      "Adobe",
-        application: "Adobe Photoshop CC 2015",
-        module:      "Generator"
-    });
-
-
-    var util = require("util"),
-        config = require("./lib/config").getConfig(),
-        generator = require("./lib/generator"),
-        Q = require("q"),
-        optimist = require("optimist");
-
-
     var optionParser = optimist["default"]({
         "p" : 49494,
         "h" : "127.0.0.1",
@@ -59,7 +51,8 @@
         "f" : null,
         "photoshopVersion": null,
         "photoshopPath": null,
-        "photoshopBinaryPath": null
+        "photoshopBinaryPath": null,
+        "whiteListedPlugins": null
     });
     
     var argv = optionParser
@@ -71,9 +64,11 @@
             "i": "file descriptor of input pipe",
             "o": "file descriptor of output pipe",
             "f": "folder to search for plugins (can be used multiple times)",
+            "v": "include verbose generator logging in stdout",
             "photoshopVersion": "tell Generator PS's version so it isn't queried at startup (optional)",
             "photoshopPath": "tell Generator PS's path so it isn't queried at startup (optional)",
             "photoshopBinaryPath": "tell Generator PS's binary location so it isn't queried at startup (optional)",
+            "whiteListedPlugins": "A comma seperated list of plugin names that are ok to run (optional)",
             "help": "display help message"
         }).alias({
             "p": "port",
@@ -81,13 +76,25 @@
             "P": "password",
             "i": "input",
             "o": "output",
-            "f": "pluginfolder"
+            "f": "pluginfolder",
+            "v": "verbose"
         }).argv;
     
     if (argv.help) {
         console.log(optimist.help());
         process.exit(0);
     }
+
+    var logSettings = {
+        vendor:      "Adobe",
+        application: "Adobe Photoshop CC 2015.5",
+        module:      "Generator",
+        verbose:     argv.verbose
+    };
+
+    // Initialize log file writer
+    // This will tap stdout and read generator-logger's readable stream
+    stdlog.setup(logSettings, generator.logStream);
 
     function stop(exitCode, reason) {
         if (!reason) {
@@ -237,11 +244,23 @@
                 var semver = require("semver"),
                     totalPluginCount = 0,
                     pluginMap = {},
-                    plugins = scanPluginDirectories(argv.pluginfolder, theGenerator);
+                    plugins = scanPluginDirectories(argv.pluginfolder, theGenerator),
+                    shouldWhiteList = typeof argv.whiteListedPlugins === "string",
+                    whiteListedPlugins;
+
+                if (shouldWhiteList) {
+                    whiteListedPlugins = argv.whiteListedPlugins.split(",").map(function (s) { return s.trim(); });
+                }
+
 
                 // Ensure all plugins have a valid semver, then put them in to a map
                 // keyed on plugin name
+
                 plugins.forEach(function (p) {
+                    if (shouldWhiteList && whiteListedPlugins.indexOf(p.metadata.name) === -1) {
+                        //if we are in "whitelist mode" skip any plugins that are not in the array
+                        return;
+                    }
                     if (!semver.valid(p.metadata.version)) {
                         p.metadata.version = "0.0.0";
                     }

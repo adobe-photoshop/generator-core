@@ -24,6 +24,10 @@
 //         before they are sent to generator. The color is converted to the working RGB profile (specified for
 //         the document in PS). By default (when this setting is false), the "raw" RGB data is sent, which is
 //         what is usually desired. (Default: false)
+//   - useICCProfile: String with the ICC color profile to use. If set this overrides
+//         the convertToWorkingRGBProfile flag. A common value is "sRGB IEC61966-2.1". (Default: "")
+//   - getICCProfileData: If true then the final ICC profile for the image is included 
+//         along with the returned pixamp (added after PS 16.1)
 //   - allowDither: controls whether any dithering could possibly happen in the color conversion
 //         to 8-bit RGB. If false, then dithering will definitely not occur, regardless of either
 //         the value of useColorSettingsDither and the color settings in Photoshop. (Default: false)
@@ -45,6 +49,8 @@
 //         Note that this option *cannot* be used with an inputRect/outputRect scaling. If inputRect/outputRect
 //         is set, this setting will be ignored and the pixels will not be cropped to document bounds.
 //         (Default: false)
+//   - clipBounds: crops retuned pixels to the given bounds
+//   - usePSClipping: if present use clipBounds to clip image
 //   - compId: number, layer comp ID (optionally and exclusive of compIndex)
 //   - compIndex: number, layer comp index (optionally and exclusive of compId) 
 //   - maxDimension: number, maximal dimension of pixmap in pixels
@@ -99,8 +105,8 @@ if (params.inputRect && params.outputRect) {
         transform.putBoolean(stringIDToTypeID("forceDumbScaling"), true);
     }
 
-    transform.putDouble(stringIDToTypeID("width"), params.scaleX * 100);
-    transform.putDouble(stringIDToTypeID("height"), params.scaleY * 100);
+    transform.putDouble(charIDToTypeID("Wdth"), params.scaleX * 100);
+    transform.putDouble(charIDToTypeID("Hght"), params.scaleY * 100);
 }
 
 if (transform) {
@@ -203,6 +209,14 @@ if (params.hasOwnProperty("convertToWorkingRGBProfile")) {
     actionDescriptor.putBoolean(stringIDToTypeID("convertToWorkingRGBProfile"), !!params.convertToWorkingRGBProfile);
 }
 
+if (params.hasOwnProperty("useICCProfile")) {
+    actionDescriptor.putString(stringIDToTypeID("useICCProfile"), String(params.useICCProfile));
+}
+
+if (params.hasOwnProperty("getICCProfileData")) {
+    actionDescriptor.putBoolean(stringIDToTypeID("sendThumbnailProfile"), !!params.getICCProfileData);
+}
+
 // NOTE: on the PS side, allowDither and useColorSettingsDither default to "true" if they are
 // not set at all. However, in Generator, the common case will be that we do NOT want to dither,
 // regardless of the settings in PS. So, on the Generator side, we default to false (hence the !! on
@@ -214,9 +228,28 @@ if (params.hasOwnProperty("clipToDocumentBounds")) {
     actionDescriptor.putBoolean(stringIDToTypeID("clipToDocumentBounds"), !!params.clipToDocumentBounds);
 }
 
+if (params.clipBounds && params.usePSClipping) {
+
+    // The part of the document to use
+    var clipBounds = params.clipBounds,
+        psClipRect = new ActionDescriptor();
+
+    psClipRect.putUnitDouble(stringIDToTypeID("left"), charIDToTypeID("#Pxl"), clipBounds.left);
+    psClipRect.putUnitDouble(stringIDToTypeID("top"), charIDToTypeID("#Pxl"), clipBounds.top);
+    
+    psClipRect.putUnitDouble(stringIDToTypeID("right"), charIDToTypeID("#Pxl"), clipBounds.right);
+    psClipRect.putUnitDouble(stringIDToTypeID("bottom"), charIDToTypeID("#Pxl"), clipBounds.bottom);
+
+    actionDescriptor.putObject(stringIDToTypeID("clipBounds"), stringIDToTypeID("clipBounds"), psClipRect);
+}
+
 if (params.boundsOnly) {
     actionDescriptor.putBoolean(stringIDToTypeID("boundsOnly"), params.boundsOnly);
 }
 actionDescriptor.putBoolean(stringIDToTypeID("bounds"), params.bounds);
+//needs to be set explicitly as a boolean
+if (params.thread === true || params.thread === false) {
+    actionDescriptor.putBoolean(stringIDToTypeID("thread"), params.thread);
+}
 
 executeAction(stringIDToTypeID("sendLayerThumbnailToNetworkClient"), actionDescriptor, DialogModes.NO);
