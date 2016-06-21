@@ -24,7 +24,7 @@
 (function () {
     "use strict";
 
-    var psCrypto = require("../lib/ps_crypto");
+    var psCrypto = require("../lib/photoshop/ps-crypto");
 
     var TEST_PASSWORD = "password";
 

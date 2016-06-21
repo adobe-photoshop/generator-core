@@ -24,8 +24,9 @@
 (function () {
     "use strict";
 
-    var photoshop = require("../lib/photoshop"),
-        psCrypto = require("../lib/ps_crypto");
+    var // photoshop = require("../lib/photoshop/client"),
+        OutboundMessage = require("../lib/photoshop/outbound-message"),
+        psCrypto = require("../lib/photoshop/ps-crypto");
 
     exports.testUnencryptedJSMessage = function (test) {
         test.expect(1);
@@ -42,7 +43,7 @@
                 "hex"
             ),
             messageBufferList = [],
-            messageStream = photoshop._createOutgoingJavascriptMessage(jsString, id, null);
+            messageStream = new OutboundMessage(jsString, id, null);
 
         messageStream.on("readable", function () {
             var b;
@@ -81,7 +82,7 @@
             expectedDecipheredPayload = new Buffer(ONE_MB_BUFFER.length + 12),
             derivedKey = psCrypto.createDerivedKey("password"),
             decipherStream = psCrypto.createDecipherStream(derivedKey),
-            messageStream = photoshop._createOutgoingJavascriptMessage(ONE_MB_STRING, id, derivedKey),
+            messageStream = new OutboundMessage(ONE_MB_STRING, id, derivedKey),
             messageBufferList = [],
             decipherBufferList = [];
 
