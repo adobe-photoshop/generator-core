@@ -14,11 +14,11 @@
     "test": "node node_modules/.bin/nodeunit test"
   },
   "dependencies": {
+    "concat-stream": "^1.5.1",
     "optimist": "~0.6",
     "q": "~1.0",
     "semver": "^5.1.0",
-    "ws": "^1.0.1",
-    "concat-stream": "^1.5.1"
+    "ws": "^1.0.1"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
