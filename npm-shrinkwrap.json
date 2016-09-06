@@ -7,17 +7,22 @@
       "from": "optimist@0.6.1",
       "resolved": "https://registry.npmjs.org/optimist/-/optimist-0.6.1.tgz",
       "dependencies": {
-        "wordwrap": {
-          "version": "0.0.2",
-          "from": "wordwrap@0.0.2",
-          "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
-        },
         "minimist": {
           "version": "0.0.10",
           "from": "minimist@0.0.10",
           "resolved": "https://registry.npmjs.org/minimist/-/minimist-0.0.10.tgz"
+        },
+        "wordwrap": {
+          "version": "0.0.2",
+          "from": "wordwrap@0.0.2",
+          "resolved": "https://registry.npmjs.org/wordwrap/-/wordwrap-0.0.2.tgz"
         }
       }
+    },
+    "options": {
+      "version": "0.0.6",
+      "from": "options@>=0.0.5",
+      "resolved": "https://registry.npmjs.org/options/-/options-0.0.6.tgz"
     },
     "q": {
       "version": "1.0.1",
@@ -26,25 +31,18 @@
     },
     "semver": {
       "version": "5.1.0",
-      "from": "semver@latest",
+      "from": "https://registry.npmjs.org/semver/-/semver-5.1.0.tgz",
       "resolved": "https://registry.npmjs.org/semver/-/semver-5.1.0.tgz"
     },
+    "ultron": {
+      "version": "1.0.2",
+      "from": "ultron@>=1.0.0 <1.1.0",
+      "resolved": "https://registry.npmjs.org/ultron/-/ultron-1.0.2.tgz"
+    },
     "ws": {
-      "version": "1.0.1",
-      "from": "ws@1.0.1",
-      "resolved": "https://registry.npmjs.org/ws/-/ws-1.0.1.tgz",
-      "dependencies": {
-        "options": {
-          "version": "0.0.6",
-          "from": "options@>=0.0.5",
-          "resolved": "https://registry.npmjs.org/options/-/options-0.0.6.tgz"
-        },
-        "ultron": {
-          "version": "1.0.2",
-          "from": "ultron@>=1.0.0 <1.1.0",
-          "resolved": "https://registry.npmjs.org/ultron/-/ultron-1.0.2.tgz"
-        }
-      }
+      "version": "1.1.1",
+      "from": "ws@1.1.1",
+      "resolved": "https://registry.npmjs.org/ws/-/ws-1.1.1.tgz"
     }
   }
 }
