@@ -1,7 +1,7 @@
 {
   "name": "generator-core",
   "version": "3.8.3",
-  "photoshop-version": ">=17.0",
+  "photoshop-version": ">=18.0",
   "description": "Adobe Photoshop Generator Core",
   "main": "app.js",
   "repository": {
@@ -17,7 +17,7 @@
     "optimist": "~0.6",
     "q": "~1.0",
     "semver": "^5.1.0",
-    "ws": "^1.0.1"
+    "ws": "^1.1.1"
   },
   "devDependencies": {
     "grunt": "~0.4.5",

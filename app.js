@@ -87,7 +87,7 @@
 
     var logSettings = {
         vendor:      "Adobe",
-        application: "Adobe Photoshop CC 2015.5",
+        application: "Adobe Photoshop CC 2017",
         module:      "Generator",
         verbose:     argv.verbose
     };
