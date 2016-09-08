@@ -1,6 +1,6 @@
 {
   "name": "generator-core",
-  "version": "3.8.3",
+  "version": "3.8.4",
   "dependencies": {
     "optimist": {
       "version": "0.6.1",
