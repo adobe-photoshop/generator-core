@@ -3,8 +3,8 @@
 // Required params:
 //   - documentId - and id of document to get guides for
 
-var originalUnits = preferences.rulerUnits;
-preferences.rulerUnits = Units.PIXELS;
+var originalUnits = app.preferences.rulerUnits;
+app.preferences.rulerUnits = Units.PIXELS;
 
 var guides = [];
 for (var i = 0; i < app.documents.length; i++) {
@@ -13,8 +13,6 @@ for (var i = 0; i < app.documents.length; i++) {
         break;
     }
 }
-
-preferences.rulerUnits = originalUnits;
 
 var horizontal = [];
 var vertical = [];
@@ -31,6 +29,8 @@ for (var i = 0; i < guides.length; ++i) {
         vertical.push(coordinate);
     }
 }
+
+app.preferences.rulerUnits = originalUnits;
 
 /* jshint -W030 */
 
