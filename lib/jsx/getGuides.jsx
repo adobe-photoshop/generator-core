@@ -1,4 +1,4 @@
-/*global preferences, Units, app, params, Direction */
+/*global Units, app, params, Direction */
 
 // Required params:
 //   - documentId - and id of document to get guides for
