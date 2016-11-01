@@ -8,9 +8,12 @@
 //         desired index range, inclusive, and (optionally) an array of indices to hide.
 //         Note that the number form takes a layer ID, *not* a layer index.
 //   - boundsOnly: Whether to only request the bounds fo the pixmap
-//   Either use absolute scaling by specifying which part of the doc should be transformed into what shape:
+//   Either use absolute scaling by specifying the output size of the result or 
+//          by specifying which part of the doc should be transformed into what shape:
 //   - inputRect:  { left: ..., top: ..., right: ..., bottom: ... }
 //   - outputRect: { left: ..., top: ..., right: ..., bottom: ... }
+//   - targetWidth:  the target width
+//   - targetHeight: the target Height
 //   Or use relative scaling by specifying horizontal and vertical factors:
 //   - scaleX:     The x-dimension scale factor (e.g. 0.5 for half size) for the output pixmap
 //   - scaleY:     The y-dimension scale factor (e.g. 0.5 for half size) for the output pixmap
@@ -63,8 +66,6 @@ var actionDescriptor = new ActionDescriptor(),
 // Add a transform if necessary
 if (params.inputRect && params.outputRect) {
     transform = new ActionDescriptor();
-
-    // The part of the document to use
     var inputRect   = params.inputRect,
         psInputRect = new ActionList();
 
@@ -82,17 +83,27 @@ if (params.inputRect && params.outputRect) {
 
     psOutputCorners.putUnitDouble(charIDToTypeID("#Pxl"), outputRect.left);
     psOutputCorners.putUnitDouble(charIDToTypeID("#Pxl"), outputRect.top);
-    
+
     psOutputCorners.putUnitDouble(charIDToTypeID("#Pxl"), outputRect.right);
     psOutputCorners.putUnitDouble(charIDToTypeID("#Pxl"), outputRect.top);
-    
+
     psOutputCorners.putUnitDouble(charIDToTypeID("#Pxl"), outputRect.right);
     psOutputCorners.putUnitDouble(charIDToTypeID("#Pxl"), outputRect.bottom);
-    
+
     psOutputCorners.putUnitDouble(charIDToTypeID("#Pxl"), outputRect.left);
     psOutputCorners.putUnitDouble(charIDToTypeID("#Pxl"), outputRect.bottom);
 
     transform.putList(stringIDToTypeID("quadrilateral"), psOutputCorners);
+} else if (params.targetWidth || params.targetHeight) {
+    transform = new ActionDescriptor();
+
+    if (params.targetWidth) {
+        transform.putDouble(stringIDToTypeID("targetWidth"), params.targetWidth);
+    }
+    if (params.targetHeight) {
+        transform.putDouble(stringIDToTypeID("targetHeight"), params.targetHeight);
+    }
+    // The part of the document to use
 
     // Absolute scaling may not keep the aspect ratio intact, in which case effects
     // cannot be scaled. To be consistent, turn it off for all of absolute scaling
