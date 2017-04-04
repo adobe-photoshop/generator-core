@@ -1,17 +1,10 @@
-/*global params, stringIDToTypeID, charIDToTypeID,
-    ActionDescriptor, ActionList, executeAction, DialogModes */
-
+/*global params, stringIDToTypeID, ActionDescriptor, executeAction, DialogModes */
 var actionDescriptor = new ActionDescriptor(),
-    width,
-    height;
+    width = 100,
+    height = 100,
+    params = {};
 
-// Add a transform if necessary
-if (params.outputRect) {
-    
-    width = outputRect.right - outputRect.left;
-    height = outputRect.bottom - outputRect.top;
 
-} 
 if (params.targetWidth || params.targetHeight) {
     if (params.targetWidth) {
     	width = params.targetWidth;
