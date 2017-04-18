@@ -1,7 +1,7 @@
 /*global params, stringIDToTypeID, ActionDescriptor, executeAction, DialogModes */
 var actionDescriptor = new ActionDescriptor(),
-    width = 100,
-    height = 100,
+    width = 30000,
+    height = 30000,
     params = {};
 
 
