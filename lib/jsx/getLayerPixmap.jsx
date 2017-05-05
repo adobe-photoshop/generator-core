@@ -58,7 +58,7 @@
 var DEFAULT_MAX_DIMENSION = 10000;
 
 var actionDescriptor = new ActionDescriptor(),
-    transform;
+    transform = null;
 
 // Add a transform if necessary
 if (params.inputRect && params.outputRect) {

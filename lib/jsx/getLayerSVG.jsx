@@ -47,18 +47,18 @@ if (typeof cssToClip === "undefined")
     $.evalFile(getPSAppPath() + appFolder[File.fs] + "Required/CopyCSSToClipboard.jsx");
 }
 
-const ksendLayerThumbnailToNetworkClientStr = app.stringIDToTypeID("sendLayerThumbnailToNetworkClient");
-const krawPixmapFilePathStr = app.stringIDToTypeID("rawPixmapFilePath");
+var ksendLayerThumbnailToNetworkClientStr = app.stringIDToTypeID("sendLayerThumbnailToNetworkClient");
+var krawPixmapFilePathStr = app.stringIDToTypeID("rawPixmapFilePath");
 
-const kformatStr = app.stringIDToTypeID("format");
-// const kselectedLayerStr = app.stringIDToTypeID("selectedLayer");
-const kwidthStr = app.stringIDToTypeID("width");
-const kheightStr = app.stringIDToTypeID("height");
-const kboundsStr = app.stringIDToTypeID("bounds");
-const klayerIDStr = app.stringIDToTypeID("layerID");
-const klayerSVGcoordinateOffset = app.stringIDToTypeID("layerSVGcoordinateOffset");
-const keyX = app.charIDToTypeID('X   ');
-const keyY = app.charIDToTypeID('Y   ');
+var kformatStr = app.stringIDToTypeID("format");
+// var kselectedLayerStr = app.stringIDToTypeID("selectedLayer");
+var kwidthStr = app.stringIDToTypeID("width");
+var kheightStr = app.stringIDToTypeID("height");
+var kboundsStr = app.stringIDToTypeID("bounds");
+var klayerIDStr = app.stringIDToTypeID("layerID");
+var klayerSVGcoordinateOffset = app.stringIDToTypeID("layerSVGcoordinateOffset");
+var keyX = app.charIDToTypeID('X   ');
+var keyY = app.charIDToTypeID('Y   ');
 
 
 function ConvertSVG()
@@ -1156,7 +1156,10 @@ svg.createSVGText = function ()
     // which is only available in PS v15 (CC 2014) and up.
     var fixBoundsAvailable = Number(app.version.match(/\d+/)) >= 15;
 
-    var bounds, savedLayer, curLayer = PSLayerInfo.layerIDToIndex(params.layerId);
+    var bounds = null,
+        savedLayer = null,
+        curLayer = PSLayerInfo.layerIDToIndex(params.layerId);
+
     this.setCurrentLayer(curLayer);
 
     svg.setLayerSVGOffset( 0.0, 0.0 );
