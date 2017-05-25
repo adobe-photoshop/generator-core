@@ -1,5 +1,6 @@
 /*global app, params */
 
+// getCustomOptions
 // Required param:
 //   - key: The id of the plugin for which to retrieve persistent settings
 

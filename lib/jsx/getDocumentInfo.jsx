@@ -17,11 +17,12 @@
 //   - documentId: The ID of the document requested (leave null for current document)
 
 var idNS = stringIDToTypeID("sendDocumentInfoToNetworkClient");
-var k, desc = new ActionDescriptor();
+var desc = new ActionDescriptor();
 desc.putString(stringIDToTypeID("version"), "1.0.1");
 
 var flags = params.flags;
 
+var k;
 for (k in flags) {
     if (flags.hasOwnProperty(k)) {
         desc.putBoolean(stringIDToTypeID(k), flags[k]);

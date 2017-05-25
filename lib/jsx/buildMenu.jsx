@@ -14,9 +14,10 @@ var enabledID = stringIDToTypeID("enabled");
 var checkedID = stringIDToTypeID("checked");
 var nodeMenuInitializeID = stringIDToTypeID("nodeMenuInitialize");
 var nodeMenuID = stringIDToTypeID("nodeMenu");
-
 var list = new ActionList();
-var menu, i;
+
+var i,
+    menu = null;
 
 for (i = 0; i < params.items.length; i++) {
     menu = new ActionDescriptor();

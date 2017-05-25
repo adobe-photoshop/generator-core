@@ -31,7 +31,8 @@ module.exports = function (grunt) {
 
         jshint : {
             options : {
-                jshintrc : ".jshintrc"
+                jshintrc : ".jshintrc",
+                reporterOutput: ""
             },
             js : [
                 "*.js",
