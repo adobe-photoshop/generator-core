@@ -134,6 +134,16 @@
                 return result;
             }
 
+            function checkIfPathDirectory(absolutePath) {
+                var result = false;
+                try {
+                    result = fs.statSync(absolutePath).isDirectory();
+                } catch (err) {
+                    console.error(err);
+                }
+                return result;
+            }
+
             // relative paths are resolved relative to the current working directory
             var resolve = require("path").resolve,
                 fs = require("fs"),
@@ -141,7 +151,7 @@
                 plugins = [],
                 potentialPlugin = null;
             
-            if (!fs.statSync(absolutePath).isDirectory()) {
+            if (!checkIfPathDirectory(absolutePath)) {
                 console.error("Error: specified plugin path '%s' is not a directory", absolutePath);
                 return plugins;
             }
@@ -161,7 +171,7 @@
                         return resolve(absolutePath, child);
                     })
                     .filter(function (absoluteChildPath) {
-                        return fs.statSync(absoluteChildPath).isDirectory();
+                        return checkIfPathDirectory(absoluteChildPath);
                     })
                     .forEach(function (absolutePluginPath) {
                         potentialPlugin = verifyPluginAtPath(absolutePluginPath);
