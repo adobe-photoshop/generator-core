@@ -78,7 +78,8 @@
             "o": "output",
             "f": "pluginfolder",
             "v": "verbose"
-        }).argv;
+        }).string("photoshopVersion")
+        .argv;
     
     if (argv.help) {
         console.log(optimist.help());
@@ -236,7 +237,7 @@
             options.hostname = argv.host;
             options.password = argv.password;
         }
-        
+
         if (argv.photoshopVersion && typeof argv.photoshopVersion === "string") {
             options.photoshopVersion = argv.photoshopVersion;
         }
