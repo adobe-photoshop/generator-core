@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2013 Adobe Systems Incorporated. All rights reserved.
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
  *  
  * The above copyright notice and this permission notice shall be included in
@@ -24,7 +24,9 @@
 (function () {
     "use strict";
 
-    var util = require("util"),
+    var fs = require("fs"),
+        resolve = require("path").resolve,
+        util = require("util"),
         optimist = require("optimist"),
         Q = require("q"),
         config = require("./lib/config").getConfig(),
@@ -41,7 +43,7 @@
         utils.filterWriteStream(process.stdout, utils.replaceBullet);
         utils.filterWriteStream(process.stderr, utils.replaceBullet);
     }
-    
+
     var optionParser = optimist["default"]({
         "p" : 49494,
         "h" : "127.0.0.1",
@@ -54,7 +56,7 @@
         "photoshopBinaryPath": null,
         "whiteListedPlugins": null
     });
-    
+
     var argv = optionParser
         .usage("Run generator service.\nUsage: $0")
         .describe({
@@ -80,7 +82,7 @@
             "v": "verbose"
         }).string("photoshopVersion")
         .argv;
-    
+
     if (argv.help) {
         console.log(optimist.help());
         process.exit(0);
@@ -146,12 +148,10 @@
             }
 
             // relative paths are resolved relative to the current working directory
-            var resolve = require("path").resolve,
-                fs = require("fs"),
-                absolutePath = resolve(process.cwd(), directory),
+            var absolutePath = resolve(process.cwd(), directory),
                 plugins = [],
                 potentialPlugin = null;
-            
+
             if (!checkIfPathDirectory(absolutePath)) {
                 console.error("Error: specified plugin path '%s' is not a directory", absolutePath);
                 return plugins;
@@ -247,7 +247,7 @@
         if (argv.photoshopBinaryPath && typeof argv.photoshopBinaryPath === "string") {
             options.photoshopBinaryPath = argv.photoshopBinaryPath;
         }
-    
+
         options.config = config;
 
         theGenerator.start(options).done(
@@ -321,10 +321,10 @@
                 deferred.reject(err);
             }
         );
-        
+
         return deferred.promise;
     }
-    
+
     function init() {
         // Start async process to initialize generator
         setupGenerator().fail(

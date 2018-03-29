@@ -7,12 +7,15 @@
     "validateIndentation": 4,
     "disallowMixedSpacesAndTabs": true,
     "requireLineFeedAtFileEnd": true,
+    "requireCapitalizedConstructorsNew": {
+        "allExcept": ["Q", "String", "Boolean"]
+    },
     "disallowTrailingComma": true,
     "validateQuoteMarks": {
         "mark": "\"",
         "escape": true
     },
-    "validateJSDoc": {
+    "jsDoc": {
         "checkParamNames": true,
         "requireParamTypes": true,
         "checkRedundantParams": true
