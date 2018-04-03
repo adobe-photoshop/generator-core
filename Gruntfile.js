@@ -68,7 +68,7 @@ module.exports = function (grunt) {
 
         nsp: {
             package: grunt.file.readJSON("package.json"),
-            shrinkwrap: grunt.file.readJSON("npm-shrinkwrap.json")
+            shrinkwrap: grunt.file.readJSON("package-lock.json")
         }
 
     });

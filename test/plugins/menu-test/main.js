@@ -33,6 +33,21 @@
 
     var actions = {};
 
+    function log(s) {
+        console.log("[" + pluginName + "-" + process.pid + "] " + s);
+    }
+
+    function setState(id, enabled, checked, displayName) {
+        _generator.toggleMenu(prefix + id, enabled, checked, displayName).then(
+            function () {
+                states[id] = {enabled: enabled, checked: checked};
+                log("toggled menu with id " + id + " to enabled: " + enabled + ", checked: " + checked);
+            }, function () {
+                log("FAILED to toggle menu with id " + id + " to enabled: " + enabled + ", checked: " + checked);
+            }
+        );
+    }
+
     var menus = [
         {
             id:     "1",
@@ -98,27 +113,12 @@
         }
     ];
 
-    function log(s) {
-        console.log("[" + pluginName + "-" + process.pid + "] " + s);
-    }
-
     function handleGeneratorMenuClicked(e) {
         log("menu chosen: '" + e.generatorMenuChanged.name + "'");
         if (actions[e.generatorMenuChanged.name]) {
             actions[e.generatorMenuChanged.name]();
         }
 
-    }
-
-    function setState(id, enabled, checked, displayName) {
-        _generator.toggleMenu(prefix + id, enabled, checked, displayName).then(
-            function () {
-                states[id] = {enabled: enabled, checked: checked};
-                log("toggled menu with id " + id + " to enabled: " + enabled + ", checked: " + checked);
-            }, function () {
-                log("FAILED to toggle menu with id " + id + " to enabled: " + enabled + ", checked: " + checked);
-            }
-        );
     }
 
     function init(generator) {
