@@ -139,7 +139,9 @@ if (transform) {
 actionDescriptor.putInteger(stringIDToTypeID("documentID"), params.documentId);
 actionDescriptor.putInteger(stringIDToTypeID("width"), params.maxDimension || DEFAULT_MAX_DIMENSION);
 actionDescriptor.putInteger(stringIDToTypeID("height"), params.maxDimension || DEFAULT_MAX_DIMENSION);
-actionDescriptor.putInteger(stringIDToTypeID("format"), 2);
+
+var format = params.getPNG ? 3 : 2;
+actionDescriptor.putInteger(stringIDToTypeID("format"), format);
 
 if (typeof(params.layerSpec) === "object") {
     actionDescriptor.putInteger(stringIDToTypeID("firstLayer"), params.layerSpec.firstLayerIndex);
