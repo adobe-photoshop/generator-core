@@ -90,7 +90,7 @@
 
     var logSettings = {
         vendor:      "Adobe",
-        application: "Adobe Photoshop CC 2018",
+        application: "Adobe Photoshop CC 2019",
         module:      "Generator",
         verbose:     argv.verbose
     };
