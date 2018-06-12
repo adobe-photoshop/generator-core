@@ -230,6 +230,10 @@ if (params.hasOwnProperty("clipToDocumentBounds")) {
     actionDescriptor.putBoolean(stringIDToTypeID("clipToDocumentBounds"), !!params.clipToDocumentBounds);
 }
 
+if (params.hasOwnProperty("trimToLayerBounds")) {
+    actionDescriptor.putBoolean(stringIDToTypeID("trimToLayerBounds"), !!params.trimToLayerBounds);
+}
+
 if (params.clipBounds && params.usePSClipping) {
 
     // The part of the document to use
