@@ -219,6 +219,10 @@ if (params.hasOwnProperty("getICCProfileData")) {
     actionDescriptor.putBoolean(stringIDToTypeID("sendThumbnailProfile"), !!params.getICCProfileData);
 }
 
+if (params.getPNG && params.hasOwnProperty("pngcolorType")) {
+    actionDescriptor.putInteger(stringIDToTypeID("pngcolorType"), params.pngcolorType);
+}
+
 // NOTE: on the PS side, allowDither and useColorSettingsDither default to "true" if they are
 // not set at all. However, in Generator, the common case will be that we do NOT want to dither,
 // regardless of the settings in PS. So, on the Generator side, we default to false (hence the !! on
