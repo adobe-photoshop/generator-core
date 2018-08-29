@@ -32,9 +32,18 @@
         config = require("./lib/config").getConfig(),
         generator = require("./lib/generator"),
         stdlog = require("./lib/stdlog"),
+        logging = require("./lib/logging"),
         utils = require("./lib/utils");
 
     var PLUGIN_KEY_PREFIX = "PLUGIN-";
+
+    var _loggerManager = new logging.LoggerManager(logging.LOG_LEVEL_INFO),
+        _logStream = new logging.StreamFormatter(_loggerManager),
+        _logger = _loggerManager.createLogger("app");
+
+    // For backwards compatibility, set the logStream on the generator object
+    // even though I believe the only place this was previously referenced was in this file
+    generator.logStream = _logStream;
 
     // On Windows, the bullet character is sometimes replaced with the bell character BEL (0x07).
     // This causes Windows to make a beeping noise every time • is printed to the console.
@@ -90,20 +99,20 @@
 
     var logSettings = {
         vendor:      "Adobe",
-        application: "Adobe Photoshop CC 2018",
+        application: "Adobe Photoshop CC 2019",
         module:      "Generator",
         verbose:     argv.verbose
     };
 
     // Initialize log file writer
     // This will tap stdout and read generator-logger's readable stream
-    stdlog.setup(logSettings, generator.logStream);
+    stdlog.setup(logSettings, _logStream);
 
     function stop(exitCode, reason) {
         if (!reason) {
             reason = "no reason given";
         }
-        console.error("Exiting with code " + exitCode + ": " + reason);
+        _logger.error("Exiting with code " + exitCode + ": " + reason);
         process.exit(exitCode);
     }
 
@@ -128,7 +137,7 @@
                     }
 
                     if (compatibility.message) {
-                        console.warn("Potential problem with plugin at '" + absolutePath +
+                        _logger.warn("Potential problem with plugin at '" + absolutePath +
                             "': " + compatibility.message);
                     }
                 } catch (metadataLoadError) {
@@ -142,7 +151,7 @@
                 try {
                     result = fs.statSync(absolutePath).isDirectory();
                 } catch (err) {
-                    console.error(err);
+                    _logger.error(err);
                 }
                 return result;
             }
@@ -153,7 +162,7 @@
                 potentialPlugin = null;
 
             if (!checkIfPathDirectory(absolutePath)) {
-                console.error("Error: specified plugin path '%s' is not a directory", absolutePath);
+                _logger.error("Error: specified plugin path '%s' is not a directory", absolutePath);
                 return plugins;
             }
 
@@ -195,10 +204,10 @@
                 allPlugins = allPlugins.concat(listPluginsInDirectory(f));
                 if (currentPluginCount === allPlugins.length) {
                     // No plugins found in this directory
-                    console.warn("No viable plugins were found in '" + f + "'");
+                    _logger.warn("No viable plugins were found in '" + f + "'");
                 }
             } catch (e) {
-                console.error("Error processing plugin directory %s\n", f, e);
+                _logger.error("Error processing plugin directory %s\n", f, e);
             }
         });
 
@@ -207,7 +216,7 @@
 
     function setupGenerator() {
         var deferred = Q.defer();
-        var theGenerator = generator.createGenerator();
+        var theGenerator = generator.createGenerator(_loggerManager);
 
         // NOTE: It *should* be the case that node automatically cleans up all pipes/sockets
         // on exit. However, on node v0.10.15 mac 64-bit there seems to be a bug where
@@ -297,7 +306,7 @@
                             theGenerator.loadPlugin(pluginSet[i].path);
                             loaded = true;
                         } catch (loadingException) {
-                            console.error("Unable to load plugin at '" + pluginSet[i].path + "': " +
+                            _logger.error("Unable to load plugin at '" + pluginSet[i].path + "': " +
                                 loadingException.message);
                         }
 
@@ -336,9 +345,9 @@
     process.on("uncaughtException", function (err) {
         if (err) {
             if (err.stack) {
-                console.error(err.stack);
+                _logger.error(err.stack);
             } else {
-                console.error(err);
+                _logger.error(err);
             }
         }
 
