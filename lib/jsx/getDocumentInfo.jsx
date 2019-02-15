@@ -1,4 +1,4 @@
-/*global stringIDToTypeID, ActionDescriptor, executeAction, DialogModes, params */
+/*global stringIDToTypeID, ActionDescriptor, executeAction, DialogModes, params, app */
 // Required params:
 //   - flags: An object with flags as keys and boolean values
 //     Sample: {
@@ -32,4 +32,9 @@ for (k in flags) {
 if (params.documentId) {
     desc.putInteger(stringIDToTypeID("documentID"), params.documentId);
 }
-executeAction(idNS, desc, DialogModes.NO);
+
+if (app.documents.length) {
+    executeAction(idNS, desc, DialogModes.NO);
+} else {
+    null; // jshint ignore:line
+}
