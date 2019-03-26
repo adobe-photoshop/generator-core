@@ -63,6 +63,7 @@
         "photoshopVersion": null,
         "photoshopPath": null,
         "photoshopBinaryPath": null,
+        "photoshopLogPath": null,
         "whiteListedPlugins": null
     });
 
@@ -79,6 +80,7 @@
             "photoshopVersion": "tell Generator PS's version so it isn't queried at startup (optional)",
             "photoshopPath": "tell Generator PS's path so it isn't queried at startup (optional)",
             "photoshopBinaryPath": "tell Generator PS's binary location so it isn't queried at startup (optional)",
+            "photoshopLogPath": "log root directory, required for generator built in mode",
             "whiteListedPlugins": "A comma seperated list of plugin names that are ok to run (optional)",
             "help": "display help message"
         }).alias({
@@ -97,9 +99,17 @@
         process.exit(0);
     }
 
+    // Warn when photoshopLogPath not supplied.
+    // This is probably OK, and only applicable to "remote" generator development
+    if (!argv.photoshopLogPath) {
+        console.log(
+            "Generator did not receive a log location via 'photoshopLogPath' param; may use a non-standard location");
+    }
+
     var logSettings = {
         vendor:      "Adobe",
-        application: "Adobe Photoshop CC 2019",
+        application: "Adobe Photoshop Generator", // for fall-back log location when photoshopLogPath not given
+        logRoot:     argv.photoshopLogPath,
         module:      "Generator",
         verbose:     argv.verbose
     };
