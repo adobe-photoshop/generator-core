@@ -7,22 +7,38 @@
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
  * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *  
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
- * 
+ *
  */
 
 (function () {
     "use strict";
+
+    // Override the node module path to disallow loading packages (via require)
+    // that are outside of the generator and plugin folders.
+    global.whitelistedModuleFolders = [__dirname];
+    var Module = require("module").Module;
+    var nodeModulePaths = Module._nodeModulePaths.bind(Module);
+    Module._nodeModulePaths = function (from) {
+        return nodeModulePaths(from).filter(function (path) {
+            for (var i = 0; i < global.whitelistedModuleFolders.length; i++) {
+                var p = global.whitelistedModuleFolders[i];
+                if (path.substring(0, p.length) === p) {
+                    return path;
+                }
+            }
+        });
+    };
 
     var fs = require("fs"),
         resolve = require("path").resolve,
@@ -209,6 +225,7 @@
         }
 
         folders.forEach(function (f) {
+            global.whitelistedModuleFolders.push(f);
             try {
                 var currentPluginCount = allPlugins.length;
                 allPlugins = allPlugins.concat(listPluginsInDirectory(f));
