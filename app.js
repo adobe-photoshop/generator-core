@@ -24,22 +24,6 @@
 (function () {
     "use strict";
 
-    // Override the node module path to disallow loading packages (via require)
-    // that are outside of the generator and plugin folders.
-    global.whitelistedModuleFolders = [__dirname];
-    var Module = require("module").Module;
-    var nodeModulePaths = Module._nodeModulePaths.bind(Module);
-    Module._nodeModulePaths = function (from) {
-        return nodeModulePaths(from).filter(function (path) {
-            for (var i = 0; i < global.whitelistedModuleFolders.length; i++) {
-                var p = global.whitelistedModuleFolders[i];
-                if (path.substring(0, p.length) === p) {
-                    return path;
-                }
-            }
-        });
-    };
-
     var fs = require("fs"),
         resolve = require("path").resolve,
         util = require("util"),
@@ -361,7 +345,29 @@
         return deferred.promise;
     }
 
+
+    // Override the node module path to disallow loading packages (via require)
+    // that are outside of the generator and plugin folders.
+    function strictModulesImport() {
+        global.whitelistedModuleFolders = [__dirname, resolve(argv.pluginfolder)];
+        var Module = require("module").Module;
+        var nodeModulePaths = Module._nodeModulePaths.bind(Module);
+        Module._nodeModulePaths = function (from) {
+            return nodeModulePaths(from).filter(function (path) {
+                for (var i = 0; i < global.whitelistedModuleFolders.length; i++) {
+                    var p = global.whitelistedModuleFolders[i];
+                    if (path.substring(0, p.length) === p) {
+                        return path;
+                    }
+                }
+            });
+        };
+    }
+
     function init() {
+        // Disable import for modules outside of the generators allowed paths
+        strictModulesImport();
+
         // Start async process to initialize generator
         setupGenerator().fail(
             function (err) {
