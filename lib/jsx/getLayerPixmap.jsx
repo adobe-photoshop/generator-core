@@ -228,7 +228,7 @@ if (params.hasOwnProperty("clipToDocumentBounds")) {
     actionDescriptor.putBoolean(stringIDToTypeID("clipToDocumentBounds"), !!params.clipToDocumentBounds);
 }
 
-if (params.clipBounds && params.usePSClipping) {
+if (params.clipBounds) {
 
     // The part of the document to use
     var clipBounds = params.clipBounds,
