@@ -16,7 +16,7 @@
   "dependencies": {
     "optimist": "~0.6",
     "q": "~1.0",
-    "semver": "^5.5.0",
+    "semver": "^7.5.2",
     "ws": "^1.1.5"
   },
   "devDependencies": {
