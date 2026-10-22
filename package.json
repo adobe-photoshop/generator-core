@@ -11,7 +11,7 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "scripts": {
-    "test": "node node_modules/.bin/nodeunit test"
+    "test": "node node_modules/nodeunit/bin/nodeunit test"
   },
   "dependencies": {
     "optimist": "~0.6",
